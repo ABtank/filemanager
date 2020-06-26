@@ -1,13 +1,13 @@
-.list-cell{
+.r-button{
     -fx-font-family: Monospaced;
-    -fx-font-size: 14.0;
+    -fx-font-size: 42.0;
     -fx-text-fill: #F00;
 }
 
-.list-cell: odd{
-    -fx-background-color: #EEE;
+.r-button: odd{
+    -fx-background-color: #555;
 }
 
-.list-cell: selected{
+.r-button: selected{
     -fx-background-color: #37F;
 }

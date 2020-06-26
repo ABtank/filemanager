@@ -10,7 +10,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 <VBox prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.999-ea"
-      xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller" stylesheets="styles.css">
     <MenuBar>
         <Menu text="File">
             <MenuItem text="Выйти из программы" onAction="#menuItemFileExitAction"/>
