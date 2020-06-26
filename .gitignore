@@ -1,5 +1,6 @@
 ## Java
 
+/TestA/
 *.class
 *.war
 *.ear
