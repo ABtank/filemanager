@@ -12,6 +12,7 @@
         <module>client</module>
         <module>server</module>
         <module>library</module>
+        <module>IOClient</module>
     </modules>
 
     <properties>
