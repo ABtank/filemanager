@@ -14,7 +14,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 <VBox alignment="CENTER" xmlns="http://javafx.com/javafx/8.0.999-ea"
-      xmlns:fx="http://javafx.com/fxml/1" fx:controller="PanelController" >
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.abramov.filemanager.controller.PanelController" >
 
     <HBox>
         <ComboBox fx:id="diskBox" onAction="#selectDiskAction"/>

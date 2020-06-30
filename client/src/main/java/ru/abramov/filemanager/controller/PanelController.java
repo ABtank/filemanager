@@ -1,3 +1,5 @@
+package ru.abramov.filemanager.controller;
+
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;

@@ -1,3 +1,5 @@
+package ru.abramov.filemanager.controller;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -12,7 +14,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception{
-        scene = new Scene(loadFXML("login"));
+        scene = new Scene(loadFXML("/login"));
         stage.setTitle("File Manager");
         stage.setScene(scene);
         stage.show();

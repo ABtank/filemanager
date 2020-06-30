@@ -6,11 +6,14 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="sceneLogin" alignment="CENTER" prefHeight="600" prefWidth="1024" xmlns="http://javafx.com/javafx/8.0.999-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="LoginController" stylesheets="styles.css">
+<VBox fx:id="sceneLogin" alignment="CENTER" prefHeight="600" prefWidth="1024" xmlns="http://javafx.com/javafx/8.0.999-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.abramov.filemanager.controller.LoginController" stylesheets="styles.css">
     <VBox alignment="CENTER" prefHeight="149.0" prefWidth="300.0" spacing="20.0">
+        <TextField fx:id="tfNickname" focusTraversable="false" alignment="CENTER" promptText="if registered, set nickname" />
         <TextField fx:id="tfLogin" alignment="CENTER" promptText="Login" />
         <PasswordField fx:id="pfPassword" alignment="CENTER" promptText="********" prefHeight="25.0" prefWidth="512.0" />
         <Button styleClass="r-button" prefHeight="60.0" prefWidth="400.0" text="Connect" onAction="#connect" />
+        <Button styleClass="r-button" prefHeight="60.0" prefWidth="600.0" text="Registration" onAction="#registration" />
+        <Button styleClass="r-button" prefHeight="60.0" prefWidth="200.0" text="Close" onAction="#exit" />
       <padding>
          <Insets bottom="5.0" left="300.0" right="300.0" top="5.0" />
       </padding>

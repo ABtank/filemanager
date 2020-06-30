@@ -1,24 +1,21 @@
+package ru.abramov.filemanager.controller;
+
 import javafx.application.Platform;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import javafx.util.Callback;
+import ru.abramov.filemanager.network.NettyClient;
 
-import javax.swing.text.TabableView;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 
 public class Controller implements Initializable {
@@ -26,9 +23,11 @@ public class Controller implements Initializable {
     @FXML
     VBox panelClient, panelServer;
 
+    NettyClient nettyClient = LoginController.getNettyClient();
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        new NIOClient();
+        System.out.println("run fxml main");
     }
 
 
@@ -114,5 +113,10 @@ public class Controller implements Initializable {
     }
 
     public void connect(ActionEvent actionEvent) {
+    }
+
+    public void menuSingOut(ActionEvent actionEvent) throws IOException {
+        Main.setRoot("/login");
+        nettyClient.close();
     }
 }
