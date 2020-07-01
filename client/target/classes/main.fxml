@@ -22,7 +22,7 @@
         <fx:include fx:id="panelServer" source="panel.fxml" HBox.hgrow="ALWAYS"/>
     </HBox>
     <HBox>
-        <Button maxWidth="Infinity" focusTraversable="false" text="Просмотр" HBox.hgrow="ALWAYS"/>
+        <Button maxWidth="Infinity" focusTraversable="false" text="Отправить файл" onAction="#sendFile" HBox.hgrow="ALWAYS"/>
         <Button maxWidth="Infinity" focusTraversable="false" onAction="#copyAction" text="Copy" HBox.hgrow="ALWAYS"/>
         <Button maxWidth="Infinity" focusTraversable="false" onAction="#moveAction" text="Move" HBox.hgrow="ALWAYS"/>
         <Button maxWidth="Infinity" focusTraversable="false" onAction="#deleteAction" text="Delete" HBox.hgrow="ALWAYS"/>

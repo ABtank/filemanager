@@ -12,6 +12,10 @@ import ru.abramov.filemanager.controller.Callback;
 public class NettyClient {
     private SocketChannel channel;
 
+    public SocketChannel getChannel() {
+        return channel;
+    }
+
     private static final String HOST = "localhost";
     private static final int PORT = 8189;
 
