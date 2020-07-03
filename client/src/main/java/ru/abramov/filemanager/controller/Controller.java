@@ -133,10 +133,10 @@ public class Controller implements Initializable {
         Path srcPath = Paths.get(srcPC.getCurrentPath(), srcPC.getSelectedFileName());
 
         try {
-            Files.delete(srcPath);
+            if(!Files.isDirectory(srcPath)) Files.delete(srcPath);
             srcPC.updateList(Paths.get(srcPC.getCurrentPath())); //обновляем панель куда скопировали
         } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Не получилось скопировать", ButtonType.OK);
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Не получилось удалить", ButtonType.OK);
             alert.showAndWait();
         }
     }
