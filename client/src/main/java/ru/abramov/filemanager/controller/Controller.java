@@ -39,6 +39,7 @@ public class Controller implements Initializable {
 
 
     public void menuItemFileExitAction(ActionEvent actionEvent) {
+        nettyClient.close();
         Platform.exit();
     }
 
