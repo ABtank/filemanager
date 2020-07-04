@@ -7,6 +7,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import ru.abramov.filemanager.network.FileSender;
 import ru.abramov.filemanager.network.NettyClient;
 
@@ -23,6 +24,8 @@ public class Controller implements Initializable {
 
     @FXML
     VBox panelClient, panelServer;
+    @FXML
+    Label lbNickname;
 
     NettyClient nettyClient = LoginController.getNettyClient();
     private static Path serverPath;
@@ -30,6 +33,8 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        //1)Получаю никнейм и зааписываю в
+        lbNickname.setText("Nickname");
         Path serverPath = Paths.get("./", "TestA", "server");
         System.out.println(serverPath);
         PanelController serverPC = (PanelController) panelServer.getProperties().get("ctrl");
@@ -134,7 +139,7 @@ public class Controller implements Initializable {
         Path srcPath = Paths.get(srcPC.getCurrentPath(), srcPC.getSelectedFileName());
 
         try {
-            if(!Files.isDirectory(srcPath)) Files.delete(srcPath);
+            if (!Files.isDirectory(srcPath)) Files.delete(srcPath);
             srcPC.updateList(Paths.get(srcPC.getCurrentPath())); //обновляем панель куда скопировали
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Не получилось удалить", ButtonType.OK);
@@ -155,6 +160,7 @@ public class Controller implements Initializable {
         PanelController clientPC = (PanelController) panelClient.getProperties().get("ctrl");
         PanelController serverPC = (PanelController) panelServer.getProperties().get("ctrl");
         try {
+            // обработка завершения передачи файла через листнер future
             FileSender.sendFile(Paths.get(clientPC.getAbsolutePathSelectedFile()), nettyClient.getChannel(), future -> {
                 if (!future.isSuccess()) {
                     future.cause().printStackTrace();

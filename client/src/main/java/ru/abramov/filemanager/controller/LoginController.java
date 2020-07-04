@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import ru.abramov.filemanager.network.AuthSender;
 import ru.abramov.filemanager.network.NettyClient;
 
 import java.io.IOException;
@@ -26,19 +27,18 @@ public class LoginController implements Initializable {
     private static NettyClient nettyClient;
 
     public void connect(ActionEvent actionEvent) throws IOException {
-        //String s = "connect\n"+"Login = " + tfLogin.getText()+ ". \nPassword = "+ pfPassword.getText();
-        String s = tfLogin.getText();
+        String s = "connect\n"+"Login = " + tfLogin.getText()+ ". \nPassword = "+ pfPassword.getText();
         System.out.println(s);
-        nettyClient.sendMessage(s);
+        System.out.println(nettyClient.getChannel()+" "+tfLogin.getText()+" "+pfPassword.getText());
+        AuthSender.sendAuth(tfLogin.getText(),pfPassword.getText(),nettyClient.getChannel());
         Main.setRoot("/main");
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        nettyClient = new NettyClient();
         System.out.println("run fxml login");
-        nettyClient = new NettyClient(args -> {
-            tfLogin.setText((String)args[0]);
-        });
+
     }
 
 

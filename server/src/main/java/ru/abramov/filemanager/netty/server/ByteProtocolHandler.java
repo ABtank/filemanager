@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,7 +16,20 @@ import java.util.List;
 public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
 
     public enum State {
-        WAIT, NAME_LENGTH, NAME, FILE_LENGTH, FILE
+        WAIT, NAME_LENGTH, NAME, FILE_LENGTH, FILE, LOGIN_LENGTH, LOGIN, PASSWORD_LENGTH, PASSWORD
+    }
+
+    public enum Act {
+        GET_FILE((byte) 32), AUTH((byte) 22);
+        private byte act;
+
+        Act(byte act) {
+            this.act = act;
+        }
+
+        public byte getActByte() {
+            return act;
+        }
     }
 
     private String stigma = "server_";
@@ -28,16 +42,16 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
 
     private String nettyServerPath = NettyServer.getServerPath().normalize().toAbsolutePath().toString();
 
-    private static int newClientIndex = 1;
     private String clientName;
+    private String nickname;
+    private static String login;
     private static final List<Channel> channels = new ArrayList<>();
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("Client connect :" + ctx);
         channels.add(ctx.channel()); // добавили слиента в лист
-        clientName = "Client№" + newClientIndex;
-        newClientIndex++;
+        clientName = "DefaultClient";
         clientPath = Paths.get(nettyServerPath + "\\" + clientName);
         if (!Files.exists(clientPath)) {
             Files.createDirectory(clientPath);
@@ -61,10 +75,14 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
 //            Сигнальный байт
             if (currentState == State.WAIT) {
                 byte readed = buf.readByte();
-                if (readed == (byte) 32) {
+                if (readed == Act.GET_FILE.getActByte()) {
                     currentState = State.NAME_LENGTH;
                     receivedFileLength = 0L;
-                    System.out.println("Сигнальный байт = (32)= копирование файла");
+                    System.out.println("Сигнальный байт =" + readed + " = копирование файла");
+                } else if (readed == Act.AUTH.getActByte()) {
+                    currentState = State.LOGIN_LENGTH;
+                    receivedFileLength = 0L;
+                    System.out.println("Сигнальный байт = " + readed + " = авторизация");
                 } else {
                     System.out.println("Invalid first byte - " + readed);
                 }
@@ -110,6 +128,60 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
                     }
                 }
             }
+            /**
+             * Авторизация
+             */
+//            Получаем длинну логина
+            if (currentState == State.LOGIN_LENGTH) {
+                if (buf.readableBytes() >= 4) {
+                    System.out.println("Получаем длинну Login");
+                    nextLength = buf.readInt();
+                    System.out.println("Длинна логина = " + nextLength);
+                    currentState = State.LOGIN;
+                }
+            }
+//            Получаем логин
+            if (currentState == State.LOGIN) {
+                if (buf.readableBytes() >= nextLength) {
+                    byte[] clientLoginBuf = new byte[nextLength];
+                    buf.readBytes(clientLoginBuf);
+                    login = new String(clientLoginBuf, "UTF-8");
+                    System.out.println("Получаем login =" + login);
+                    currentState = State.PASSWORD_LENGTH;
+                }
+            }
+
+//            Получаем длинну пароля
+            if (currentState == State.PASSWORD_LENGTH) {
+                if (buf.readableBytes() >= 4) {
+                    nextLength = buf.readInt();
+                    System.out.println("Длинна пароля = " + nextLength);
+                    currentState = State.PASSWORD;
+                    System.out.println(currentState);
+                }
+            }
+//            Получаем пароль
+            if (currentState == State.PASSWORD) {
+                if (buf.readableBytes() >= nextLength) {
+                    byte[] clientPasswordBuf = new byte[nextLength];
+                    buf.readBytes(clientPasswordBuf);
+                    String password = new String(clientPasswordBuf, "UTF-8");
+                    System.out.println("Получаем пароль = " + password);
+                    nickname = SqlClient.getNickname(login, password);
+                    if (nickname != null) {
+                        System.out.println("nickname= " + nickname);
+                        NickNameSender.send(nickname, ctx.channel());
+                        clientPath = Paths.get(nettyServerPath + "\\" + nickname);
+                        if (!Files.exists(clientPath)) {
+                            Files.createDirectory(clientPath);
+                        }
+                    } else {
+                        ctx.channel().close();
+                        System.out.println("ctx.channel().isActive()" + ctx.channel().isActive());
+                    }
+                    currentState = State.WAIT;
+                }
+            }
 
         }
         if (buf.readableBytes() == 0) {
@@ -117,15 +189,6 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private void getFileNameLength(ByteBuf buf) {
-        if (currentState == State.NAME_LENGTH) {
-            if (buf.readableBytes() >= 4) {
-                System.out.println("Получаем длинну имени файла");
-                nextLength = buf.readInt();
-                currentState = State.NAME;
-            }
-        }
-    }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
