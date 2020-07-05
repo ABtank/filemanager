@@ -29,13 +29,15 @@ public class Controller implements Initializable {
 
     NettyClient nettyClient = LoginController.getNettyClient();
     private static Path serverPath;
+    private String nickname = "DefaultClient";
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         //1)Получаю никнейм и зааписываю в
-        lbNickname.setText("Nickname");
-        Path serverPath = Paths.get("./", "TestA", "server");
+
+        lbNickname.setText("Hello " + nickname);
+        Path serverPath = Paths.get("./", "TestA", "server",nickname);
         System.out.println(serverPath);
         PanelController serverPC = (PanelController) panelServer.getProperties().get("ctrl");
         serverPC.updateList(serverPath.normalize().toAbsolutePath());

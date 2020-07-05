@@ -12,7 +12,9 @@
 <?import javafx.scene.control.Label?>
 <VBox prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.999-ea"
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.abramov.filemanager.controller.Controller" stylesheets="styles.css">
-   <Label fx:id="lbNickname" text=""/>
+
+   <Label fx:id="lbNickname" text="" textAlignment="CENTER" maxWidth="Infinity" alignment="CENTER"/>
+
     <MenuBar>
         <Menu text="File">
             <MenuItem text="Выйти из программы" onAction="#menuItemFileExitAction"/>
