@@ -6,24 +6,25 @@ import io.netty.channel.Channel;
 
 import java.nio.charset.StandardCharsets;
 
-public class NickNameSender {
-    private static final String SERVER = "NickNameSender: ";
+public class StringSender {
+    private static final String LOGER = "StringSender: ";
 
-    public static void send(String nickname, Channel channel) {
+    public static void send(String nickname, Channel channel, SignalByte signalByte) {
         ByteBuf buf = null;
 //        отправка сигнального байта
         buf = ByteBufAllocator.DEFAULT.directBuffer(1);
-        buf.writeByte((byte) 22);
+        buf.writeByte(signalByte.getActByte());
+        System.out.println(LOGER + " отправка сигнального байта" + signalByte);
         channel.writeAndFlush(buf);
-        System.out.println(SERVER + "отправка сигнального байта" + buf);
-//       длинна никнейма
+//       длинна строки
         buf = ByteBufAllocator.DEFAULT.directBuffer(4);
         buf.writeInt(nickname.length());
         channel.writeAndFlush(buf);
-//        никнейм
+//        строка
         byte[] loginBytes = nickname.getBytes(StandardCharsets.UTF_8);
         buf = ByteBufAllocator.DEFAULT.directBuffer(loginBytes.length);
         buf.writeBytes(loginBytes);
         channel.writeAndFlush(buf);
+        System.out.println(LOGER + " отправка завершена");
     }
 }

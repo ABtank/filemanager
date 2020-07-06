@@ -26,14 +26,14 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
     VBox panelServer;
 
     public enum State {
-        WAIT, NAME_LENGTH, NAME, FILE_LENGTH, FILE, NICKNAME_LENGTH, NICKNAME
+        WAIT, NAME_LENGTH, NAME, FILE_LENGTH, FILE, NICKNAME_LENGTH, NICKNAME,FILE_LIST_LENGTH,FILELIST
     }
 
-    public enum Act {
-        GET_FILE((byte) 32), AUTH((byte) 22);
+    public enum SignalByte {
+        GET_FILE((byte) 32), AUTH((byte) 22), SET_LIST_FILE((byte) 11);
         private byte act;
 
-        Act(byte act) {
+        SignalByte(byte act) {
             this.act = act;
         }
 
@@ -42,7 +42,7 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private static final String CLIENT = "CLIENT: ";
+    private static final String CLIENT = "CLIENT ByteProtocolHandler: ";
     private State currentState = State.WAIT;
     private int nextLength;
     private long fileLength;
@@ -69,38 +69,74 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
 //            Сигнальный байт
             if (currentState == State.WAIT) {
                 byte readed = buf.readByte();
-                if (readed == Act.GET_FILE.getActByte()) {
+                if (readed == SignalByte.GET_FILE.getActByte()) {
                     currentState = State.NAME_LENGTH;
                     receivedFileLength = 0L;
                     System.out.println(CLIENT + "Сигнальный байт =" + readed + " = копирование файла");
-                } else if (readed == Act.AUTH.getActByte()) {
+                } else if (readed == SignalByte.AUTH.getActByte()) {
                     currentState = State.NICKNAME_LENGTH;
                     receivedFileLength = 0L;
                     System.out.println(CLIENT + "Сигнальный байт = " + readed + " = авторизация");
+                } else if (readed == SignalByte.SET_LIST_FILE.getActByte()) {
+                    currentState = State.FILE_LIST_LENGTH;
+                    receivedFileLength = 0L;
+                    System.out.println(CLIENT + "Сигнальный байт = " + readed + " = получение списка файлов");
                 } else {
                     System.out.println(CLIENT + "Invalid first byte - " + readed);
                 }
             }
 
 //            Получаем длинну nickname
-            if (currentState == State.NICKNAME_LENGTH) {
-                if (buf.readableBytes() >= 4) {
-                    System.out.println(CLIENT + "Получаем длинну nickname");
-                    nextLength = buf.readInt();
-                    System.out.println(CLIENT + "Длинна nickname = " + nextLength);
-                    currentState = State.NICKNAME;
-                }
-            }
+            getLengthNickname(buf);
 //            Получаем nickname
             getNickname(buf);
+
+//            Получаем длинну слроки
+            getLengthFileList(buf);
+//            Получаем строку
+            getFileList(buf);
         }
         if (buf.readableBytes() == 0) {
             buf.release();
         }
     }
 
+    private void getLengthNickname(ByteBuf buf) {
+        if (currentState == State.NICKNAME_LENGTH) {
+            if (buf.readableBytes() >= 4) {
+                System.out.println(CLIENT + "Получаем длинну nickname");
+                nextLength = buf.readInt();
+                System.out.println(CLIENT + "Длинна nickname = " + nextLength);
+                currentState = State.NICKNAME;
+            }
+        }
+    }
+
     private void getNickname(ByteBuf buf) throws UnsupportedEncodingException {
         if (currentState == State.NICKNAME) {
+            if (buf.readableBytes() >= nextLength) {
+                byte[] clientLoginBuf = new byte[nextLength];
+                buf.readBytes(clientLoginBuf);
+                nickname = new String(clientLoginBuf, "UTF-8");
+                System.out.println(CLIENT + "Получаем nickname =" + nickname);
+                currentState = State.WAIT;
+            }
+        }
+    }
+
+    private void getLengthFileList(ByteBuf buf) {
+        if (currentState == State.FILE_LIST_LENGTH) {
+            if (buf.readableBytes() >= 4) {
+                System.out.println(CLIENT + "Получаем длинну nickname");
+                nextLength = buf.readInt();
+                System.out.println(CLIENT + "Длинна nickname = " + nextLength);
+                currentState = State.FILELIST;
+            }
+        }
+    }
+
+    private void getFileList(ByteBuf buf) throws UnsupportedEncodingException {
+        if (currentState == State.FILELIST) {
             if (buf.readableBytes() >= nextLength) {
                 byte[] clientLoginBuf = new byte[nextLength];
                 buf.readBytes(clientLoginBuf);

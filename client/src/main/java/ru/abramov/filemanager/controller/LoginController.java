@@ -27,16 +27,19 @@ public class LoginController implements Initializable {
     private static NettyClient nettyClient;
 
     public void connect(ActionEvent actionEvent) throws IOException {
-        String s = "connect\n"+"Login = " + tfLogin.getText()+ ". \nPassword = "+ pfPassword.getText();
-        System.out.println(s);
-        System.out.println(nettyClient.getChannel()+" "+tfLogin.getText()+" "+pfPassword.getText());
-        AuthSender.sendAuth(tfLogin.getText(),pfPassword.getText(),nettyClient.getChannel());
-        Main.setRoot("/main");
+        if(!tfLogin.getText().trim().isEmpty()&&!pfPassword.getText().isEmpty()){
+            nettyClient = new NettyClient();
+            while (nettyClient.getChannel()== null){
+            }
+            System.out.println(nettyClient.getChannel()+" "+tfLogin.getText()+" "+pfPassword.getText());
+            AuthSender.sendAuth(tfLogin.getText(),pfPassword.getText(),nettyClient.getChannel());
+            Main.setRoot("/main");
+        }
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        nettyClient = new NettyClient();
+
         System.out.println("run fxml login");
 
     }

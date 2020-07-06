@@ -33,9 +33,8 @@ public class Controller implements Initializable {
 
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void initialize(URL location, ResourceBundle resources){
         //1)Получаю никнейм и зааписываю в
-
         lbNickname.setText("Hello " + nickname);
         Path serverPath = Paths.get("./", "TestA", "server",nickname);
         System.out.println(serverPath);
