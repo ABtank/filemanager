@@ -2,4 +2,6 @@ C:\Users\ABtan\OneDrive\CODDING\Java-programist\Java5Level\filemanager\server\sr
 C:\Users\ABtan\OneDrive\CODDING\Java-programist\Java5Level\filemanager\server\src\main\java\ru\abramov\filemanager\netty\server\ByteProtocolHandler.java
 C:\Users\ABtan\OneDrive\CODDING\Java-programist\Java5Level\filemanager\server\src\main\java\ru\abramov\filemanager\netty\server\NettyServer.java
 C:\Users\ABtan\OneDrive\CODDING\Java-programist\Java5Level\filemanager\server\src\main\java\ru\abramov\filemanager\netty\server\MainHandler.java
+C:\Users\ABtan\OneDrive\CODDING\Java-programist\Java5Level\filemanager\server\src\main\java\ru\abramov\filemanager\netty\server\SignalByte.java
 C:\Users\ABtan\OneDrive\CODDING\Java-programist\Java5Level\filemanager\server\src\main\java\NIOServer\NIOServer.java
+C:\Users\ABtan\OneDrive\CODDING\Java-programist\Java5Level\filemanager\server\src\main\java\ru\abramov\filemanager\netty\server\StringSender.java
