@@ -16,20 +16,20 @@ public class AuthSender {
         channel.writeAndFlush(buf);
         System.out.println("отправка сигнального байта" + buf);
 //        длинна логина
+        byte[] loginBytes = login.getBytes(StandardCharsets.UTF_8);
         buf = ByteBufAllocator.DEFAULT.directBuffer(4);
-        buf.writeInt(login.length());
+        buf.writeInt(loginBytes.length);
         channel.writeAndFlush(buf);
 //        логин
-        byte[] loginBytes = login.getBytes(StandardCharsets.UTF_8);
         buf = ByteBufAllocator.DEFAULT.directBuffer(loginBytes.length);
         buf.writeBytes(loginBytes);
         channel.writeAndFlush(buf);
 //        длинна пароля
+        byte[] passwordBytes = password.getBytes(StandardCharsets.UTF_8);
         buf = ByteBufAllocator.DEFAULT.directBuffer(4);
-        buf.writeInt(password.length());
+        buf.writeInt(passwordBytes.length);
         channel.writeAndFlush(buf);
 //        password
-        byte[] passwordBytes = password.getBytes(StandardCharsets.UTF_8);
         System.out.println(password);
         buf = ByteBufAllocator.DEFAULT.directBuffer(passwordBytes.length);
         buf.writeBytes(passwordBytes);

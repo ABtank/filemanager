@@ -19,11 +19,11 @@ public class FileSender {
         buf.writeByte((byte) 32);
         channel.writeAndFlush(buf);
 //      длинна имени файла
+        byte[] filenameBytes = path.getFileName().toString().getBytes(StandardCharsets.UTF_8);
         buf = ByteBufAllocator.DEFAULT.directBuffer(4);
-        buf.writeInt(path.getFileName().toString().length());
+        buf.writeInt(filenameBytes.length);
         channel.writeAndFlush(buf);
 //      имя файла
-        byte[] filenameBytes = path.getFileName().toString().getBytes(StandardCharsets.UTF_8);
         buf = ByteBufAllocator.DEFAULT.directBuffer(filenameBytes.length);
         buf.writeBytes(filenameBytes);
         channel.writeAndFlush(buf);
