@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import ru.abramov.filemanager.common.SignalByte;
+import ru.abramov.filemanager.common.StringSender;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -153,14 +155,15 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
                     nickname = SqlClient.getNickname(login, password);
                     if (nickname != null) {
                         System.out.println(LOGER + "nickname= " + nickname);
-                        StringSender.send(nickname, ctx.channel(), SignalByte.AUTH);
+                        StringSender.sendSignalByte(ctx.channel(), SignalByte.AUTH);
+                        StringSender.sendString(nickname,ctx.channel());
                         clientPath = Paths.get(nettyServerPath + "\\" + nickname);
                         if (!Files.exists(clientPath)) {
                             Files.createDirectory(clientPath);
                         }
                         NettyServer.setServerPath(clientPath);
                         getFilesList();
-                        StringSender.send(clientPath.toString(),ctx.channel(), SignalByte.SET_LIST_FILE);
+                        StringSender.sendFileList(clientPath.toString(),ctx.channel());
                         if (!Files.exists(clientPath)) {
                             Files.createDirectory(clientPath);
                         }

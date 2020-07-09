@@ -6,7 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import ru.abramov.filemanager.network.AuthSender;
+import ru.abramov.filemanager.common.StringSender;
 import ru.abramov.filemanager.network.NettyClient;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class LoginController implements Initializable {
             while (nettyClient.getChannel()== null){
             }
             System.out.println(nettyClient.getChannel()+" "+tfLogin.getText()+" "+pfPassword.getText());
-            AuthSender.sendAuth(tfLogin.getText(),pfPassword.getText(),nettyClient.getChannel());
+            StringSender.sendAuth(tfLogin.getText(),pfPassword.getText(),nettyClient.getChannel());
             Main.setRoot("/main");
         }
     }

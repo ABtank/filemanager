@@ -27,6 +27,7 @@
         <module>client</module>
         <module>server</module>
         <module>library</module>
+        <module>common</module>
     </modules>
 
     <properties>
