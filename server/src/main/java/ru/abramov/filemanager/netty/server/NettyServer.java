@@ -7,8 +7,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,8 +43,8 @@ public class NettyServer {
             controller.setTfLogServer("Netty server ON");
             SqlClient.connect();
             controller.setTfLogServer("DB connected");
-            future.channel().closeFuture().sync(); // остановка сервера
             SqlClient.disConnect();
+            future.channel().closeFuture().sync(); // остановка сервера
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

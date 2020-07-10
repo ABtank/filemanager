@@ -185,9 +185,7 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
     }
 
     public void getFilesList() {
-        
     }
-
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {

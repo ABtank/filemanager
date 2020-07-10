@@ -6,7 +6,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import ru.abramov.filemanager.common.StringSender;
 import ru.abramov.filemanager.network.NettyClient;
 
 import java.io.IOException;
