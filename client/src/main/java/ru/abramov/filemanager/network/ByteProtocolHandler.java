@@ -7,6 +7,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import ru.abramov.filemanager.controller.Controller;
 import ru.abramov.filemanager.controller.PanelController;
 
 import java.io.BufferedOutputStream;
@@ -119,6 +120,7 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
                 buf.readBytes(clientLoginBuf);
                 nickname = new String(clientLoginBuf, "UTF-8");
                 System.out.println(CLIENT + "Получаем nickname =" + nickname);
+                Controller.setNickname(nickname);
                 currentState = State.WAIT;
             }
         }

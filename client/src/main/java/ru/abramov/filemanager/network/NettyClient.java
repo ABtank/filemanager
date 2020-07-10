@@ -5,6 +5,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.channel.socket.SocketChannel;
+import ru.abramov.filemanager.common.StringSender;
 
 public class NettyClient {
     private SocketChannel channel;
@@ -16,7 +17,7 @@ public class NettyClient {
     private static final String HOST = "localhost";
     private static final int PORT = 8189;
 
-    public NettyClient() {
+    public NettyClient(String login, String password) {
         Thread t = new Thread(() -> {
             EventLoopGroup workerGroup = new NioEventLoopGroup();
             try {
@@ -34,6 +35,7 @@ public class NettyClient {
                             }
                         });
                 ChannelFuture future = b.connect(HOST, PORT).sync();
+                StringSender.sendAuth(login,password, channel);
                 future.channel().closeFuture().sync();
             } catch (Exception e) {
                 e.printStackTrace();

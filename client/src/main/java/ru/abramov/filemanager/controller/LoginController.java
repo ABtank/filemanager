@@ -28,11 +28,11 @@ public class LoginController implements Initializable {
 
     public void connect(ActionEvent actionEvent) throws IOException {
         if(!tfLogin.getText().trim().isEmpty()&&!pfPassword.getText().isEmpty()){
-            nettyClient = new NettyClient();
-            while (nettyClient.getChannel()== null){
-            }
+            nettyClient = new NettyClient(tfLogin.getText(),pfPassword.getText());
+//            while (nettyClient.getChannel()== null){
+//            }
             System.out.println(nettyClient.getChannel()+" "+tfLogin.getText()+" "+pfPassword.getText());
-            StringSender.sendAuth(tfLogin.getText(),pfPassword.getText(),nettyClient.getChannel());
+//            StringSender.sendAuth(tfLogin.getText(),pfPassword.getText(),nettyClient.getChannel());
             Main.setRoot("/main");
         }
     }

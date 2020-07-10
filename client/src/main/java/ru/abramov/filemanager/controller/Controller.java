@@ -29,8 +29,11 @@ public class Controller implements Initializable {
 
     NettyClient nettyClient = LoginController.getNettyClient();
     private static Path serverPath;
-    private String nickname = "DefaultClient";
+    private static String nickname = "DefaultClient";
 
+    public static void setNickname(String nickname) {
+        Controller.nickname = nickname;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources){
