@@ -29,17 +29,26 @@ public class Controller implements Initializable {
 
     NettyClient nettyClient = LoginController.getNettyClient();
     private static Path serverPath;
-    private static String nickname = "DefaultClient";
+    private static String nickname;
 
     public static void setNickname(String nickname) {
         Controller.nickname = nickname;
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources){
+    public void initialize(URL location, ResourceBundle resources) {
         //1)Получаю никнейм и зааписываю в
+        int i = 0;
+        while (nickname == null) {
+            System.out.println(nickname + i++);
+            if (i >= 1000000) {
+                i = 0;
+                errorConnect();
+                break;
+            }
+        }
         lbNickname.setText("Hello " + nickname);
-        Path serverPath = Paths.get("./", "TestA", "server",nickname);
+        Path serverPath = Paths.get("./", nickname);
         System.out.println(serverPath);
         PanelController serverPC = (PanelController) panelServer.getProperties().get("ctrl");
         serverPC.updateList(serverPath.normalize().toAbsolutePath());
@@ -155,7 +164,21 @@ public class Controller implements Initializable {
     }
 
     public void menuSingOut(ActionEvent actionEvent) throws IOException {
+        nickname = null;
         Main.setRoot("/login");
+        nettyClient.close();
+    }
+
+    public void errorConnect() {
+        try {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Нет ответа от сервера при авторизации. Либо неверно введен login/password", ButtonType.OK);
+            alert.showAndWait();
+            Main.setRoot("/login");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Не удалось восстановить меню авторизации", ButtonType.OK);
+            alert.showAndWait();
+        }
         nettyClient.close();
     }
 

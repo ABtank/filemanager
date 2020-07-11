@@ -18,7 +18,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>Main</mainClass>
+                            <mainClass>ru.abramov.filemanager.controller.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -39,11 +39,6 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.1.50.Final</version>
-        </dependency>
         <dependency>
             <groupId>ru.Abramov.Java.FileManager</groupId>
             <artifactId>common</artifactId>

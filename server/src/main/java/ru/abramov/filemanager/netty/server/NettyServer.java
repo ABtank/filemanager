@@ -18,7 +18,7 @@ public class NettyServer {
     private static Path serverPath;
 
     public static Path getServerPath() {
-        return serverPath = Paths.get("./", "TestA", "server");
+        return serverPath = Paths.get("./");
     }
 
     public static void setServerPath(Path serverPath) {
@@ -35,7 +35,6 @@ public class NettyServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            // socketChannel.pipeline().addLast(new StringDecoder(), new StringEncoder(), new MainHandler());
                             socketChannel.pipeline().addLast(new ByteProtocolHandler());
                         }
                     });

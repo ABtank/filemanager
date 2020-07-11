@@ -94,7 +94,7 @@ public class PanelController implements Initializable {
             }
         });
 
-        updateList(Paths.get("./","TestA")); // корневой каталог
+        updateList(Paths.get("./")); // корневой каталог
 
     }
 
@@ -105,7 +105,7 @@ public class PanelController implements Initializable {
             filesTable.getItems().addAll(Files.list(path).map(FileInfo::new).collect(Collectors.toList()));
             filesTable.sort();
         } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Список файлов не получается обновить", ButtonType.OK);
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Список файлов не получается обновить "+ path, ButtonType.OK);
             alert.showAndWait();
         }
     }
