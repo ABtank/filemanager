@@ -29,8 +29,6 @@ public class NettyClient {
                             protected void initChannel(SocketChannel socketChannel) throws Exception {
                                 channel = socketChannel;
                                 socketChannel.pipeline().addLast( new ByteProtocolHandler()
-//                                        new StringDecoder(), new StringEncoder()
-                                       // new ClientHandler(onMessageReceivedCallback)
                                 );
                             }
                         });

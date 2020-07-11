@@ -1,30 +1,15 @@
 package ru.abramov.filemanager.network;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 import ru.abramov.filemanager.controller.Controller;
-import ru.abramov.filemanager.controller.PanelController;
 
 import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
-    @FXML
-    Label lbNickname;
-
-    @FXML
-    VBox panelServer;
 
     public enum State {
         WAIT, NAME_LENGTH, NAME, FILE_LENGTH, FILE, NICKNAME_LENGTH, NICKNAME,FILE_LIST_LENGTH,FILELIST

@@ -71,7 +71,7 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
                     receivedFileLength = 0L;
                     controller.setTfLogServer(LOGER + "Сигнальный байт = " + readed + " = авторизация");
                 } else {
-                    System.out.println(LOGER + "Invalid first byte - " + readed);
+                    controller.setTfLogServer(LOGER + "Invalid first byte - " + readed);
                 }
             }
 //              Получаем длинну имени файла
@@ -183,7 +183,6 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
     public void getFilesList() {
 
     }
-
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {

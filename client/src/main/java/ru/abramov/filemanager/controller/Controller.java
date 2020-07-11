@@ -160,9 +160,6 @@ public class Controller implements Initializable {
         }
     }
 
-    public void connect(ActionEvent actionEvent) {
-    }
-
     public void menuSingOut(ActionEvent actionEvent) throws IOException {
         nickname = null;
         Main.setRoot("/login");

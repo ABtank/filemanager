@@ -14,7 +14,6 @@ public class SqlClient {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:users.db");
             statement = connection.createStatement();
-            System.out.println("DB connected");
         } catch (ClassNotFoundException | SQLException e) {
             throw new RuntimeException(e);
         }
