@@ -1,6 +1,7 @@
-ru\abramov\filemanager\netty\server\MainHandler.class
-ru\abramov\filemanager\netty\server\NettyServer.class
 ru\abramov\filemanager\netty\server\ByteProtocolHandler.class
-ru\abramov\filemanager\netty\server\NettyServer$1.class
-ru\abramov\filemanager\netty\server\SqlClient.class
+ru\abramov\filemanager\netty\server\Controller.class
 ru\abramov\filemanager\netty\server\ByteProtocolHandler$State.class
+ru\abramov\filemanager\netty\server\NettyServer.class
+ru\abramov\filemanager\netty\server\NettyServer$1.class
+ru\abramov\filemanager\netty\server\ServerGUI.class
+ru\abramov\filemanager\netty\server\SqlClient.class

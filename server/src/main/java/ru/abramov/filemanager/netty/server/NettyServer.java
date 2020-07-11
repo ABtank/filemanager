@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 public class NettyServer {
     private static final int PORT = 8189;
     private static Path serverPath;
+    private Controller controller;
 
     public static Path getServerPath() {
         return serverPath = Paths.get("./");
@@ -25,7 +26,9 @@ public class NettyServer {
         NettyServer.serverPath = serverPath;
     }
 
-    public static void main(String[] args) {
+    public NettyServer(Controller controller) {
+        this.controller =controller;
+        Thread t = new Thread(() -> {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1); // пул потоков подключения клиентов
         EventLoopGroup workerGroup = new NioEventLoopGroup(); // обработка данных
         try {
@@ -35,12 +38,13 @@ public class NettyServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast(new ByteProtocolHandler());
+                            socketChannel.pipeline().addLast(new ByteProtocolHandler(controller));
                         }
                     });
             ChannelFuture future = b.bind(PORT).sync(); // запуск сервера
-            System.out.println("Netty server ON");
+            controller.setTfLogServer("Netty server ON");
             SqlClient.connect();
+            controller.setTfLogServer("DB connected");
             future.channel().closeFuture().sync(); // остановка сервера
             SqlClient.disConnect();
         } catch (Exception e) {
@@ -49,6 +53,7 @@ public class NettyServer {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
-
+        });
+        t.start();
     }
 }

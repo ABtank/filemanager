@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefHeight="600.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.abramov.filemanager.netty.server.Controller">
+
+    <TextArea fx:id="taLogServer" editable="false" prefHeight="382.0" prefWidth="600.0" VBox.vgrow="ALWAYS" />
+    <HBox>
+        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#connect" text="Connect" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+         <HBox.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </HBox.margin></Button>
+        <Button maxWidth="Infinity" mnemonicParsing="false" text="disconnect" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+         <HBox.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </HBox.margin></Button>
+        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#exit" text="Exit" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+         <HBox.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </HBox.margin></Button>
+      <VBox.margin>
+         <Insets />
+      </VBox.margin>
+    </HBox>
+</VBox>
