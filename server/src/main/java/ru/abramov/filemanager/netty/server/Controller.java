@@ -19,7 +19,13 @@ public class Controller implements Initializable {
         setTfLogServer("connect");
     }
 
+    public void disconnect(ActionEvent actionEvent) {
+        setTfLogServer("disconnect");
+        NettyServer.close();
+    }
+
     public void exit(ActionEvent actionEvent) {
+        NettyServer.close();
         Platform.exit();
     }
 

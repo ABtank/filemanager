@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
     @FXML
-    TextField tfLogin;
+    TextField tfLogin, tfHost;
 
     @FXML
     PasswordField pfPassword;
@@ -27,7 +27,7 @@ public class LoginController implements Initializable {
 
     public void connect(ActionEvent actionEvent) throws IOException {
         if(!tfLogin.getText().trim().isEmpty()&&!pfPassword.getText().isEmpty()){
-            nettyClient = new NettyClient(tfLogin.getText(),pfPassword.getText());
+            nettyClient = new NettyClient(tfLogin.getText(),pfPassword.getText(),tfHost.getText());
             System.out.println(nettyClient.getChannel()+" "+tfLogin.getText()+" "+pfPassword.getText());
             Main.setRoot("/main");
         }
@@ -35,11 +35,8 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         System.out.println("run fxml login");
-
     }
-
 
     public void registration(ActionEvent actionEvent) {
     }

@@ -15,6 +15,7 @@ public class NettyServer {
     private static final int PORT = 8189;
     private static Path serverPath;
     private Controller controller;
+    private static Thread t;
 
     public static Path getServerPath() {
         return serverPath = Paths.get("./");
@@ -26,7 +27,7 @@ public class NettyServer {
 
     public NettyServer(Controller controller) {
         this.controller =controller;
-        Thread t = new Thread(() -> {
+        t = new Thread(() -> {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1); // пул потоков подключения клиентов
         EventLoopGroup workerGroup = new NioEventLoopGroup(); // обработка данных
         try {
@@ -53,5 +54,9 @@ public class NettyServer {
         }
         });
         t.start();
+    }
+
+    public static void close(){
+        t.interrupt();
     }
 }
