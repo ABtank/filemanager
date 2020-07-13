@@ -17,14 +17,16 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
+public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
 
     public enum State {
-        WAIT, NAME_FILE_LENGTH, NAME, FILE_LENGTH, FILE,
+        WAIT,
+        NAME_FILE_LENGTH, NAME, FILE_LENGTH, FILE,
+        REQUEST_NAME_FILE_LENGTH, REQUEST_NAME_FILE,
         LOGIN_LENGTH, LOGIN, PASSWORD_LENGTH, PASSWORD
     }
 
-    public ByteProtocolHandler(Controller controller) {
+    public ByteProtocolServerHandler(Controller controller) {
         this.controller = controller;
     }
 
@@ -42,20 +44,19 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
     private String nickname;
     private static String login;
     private static final List<Channel> channels = new ArrayList<>();
-    private static final String LOGER = "Server ByteProtocolHandler: ";
+    private static final String LOGER = "Server ByteProtocolServerHandler: ";
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        controller.setTfLogServer(LOGER + "Client connect :" + ctx);
+        controller.setTfLogServer(LOGER + "Client connect : " + ctx);
         channels.add(ctx.channel()); // добавили слиента в лист
         controller.setTfLogServer(LOGER + "Подключился новый клиент " + nickname);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        controller.setTfLogServer(LOGER + "Клиент " + nickname + "вышел из сети." + "\nНа сервере " + channels.size() + " клиентов.");
         channels.remove(ctx.channel());
-        controller.setTfLogServer(LOGER + "Клиент " + nickname + "вышел из сети" + "На сервере " + channels.size() + " клиентов.");
+        controller.setTfLogServer(LOGER + "Клиент " + nickname + " вышел из сети.\n" + "На сервере " + channels.size() + " клиентов.");
         ctx.close();
     }
 
@@ -74,17 +75,23 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
                     currentState = State.LOGIN_LENGTH;
                     receivedFileLength = 0L;
                     controller.setTfLogServer(LOGER + "Сигнальный байт = " + signalByte + " = авторизация");
+                } else if (signalByte == SignalByte.REQUEST_FILE.getActByte()) {
+                    currentState = State.REQUEST_NAME_FILE_LENGTH;
+                    receivedFileLength = 0L;
+                    controller.setTfLogServer(LOGER + "Сигнальный байт = " + signalByte + " = запрос файла");
                 } else {
                     controller.setTfLogServer(LOGER + "Invalid first byte - " + signalByte);
                 }
             }
 //              Получаем длинну имени файла
-            if (currentState == State.NAME_FILE_LENGTH) {
+            if (currentState == State.NAME_FILE_LENGTH || currentState == State.REQUEST_NAME_FILE_LENGTH) {
                 if (buf.readableBytes() >= 4) {
                     controller.setTfLogServer(LOGER + "Получаем длинну имени файла");
                     nextLength = buf.readInt();
                     controller.setTfLogServer("" + nextLength);
-                    currentState = State.NAME;
+                    if (currentState == State.NAME_FILE_LENGTH) {
+                        currentState = State.NAME;
+                    } else currentState = State.REQUEST_NAME_FILE;
                 }
             }
 //              Получаем имя файла и открываем поток прописывая новое имя файла
@@ -98,6 +105,32 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
                     currentState = State.FILE_LENGTH;
                 }
             }
+            if (currentState == State.REQUEST_NAME_FILE) {
+                if (buf.readableBytes() >= nextLength) {
+                    byte[] fileNameByte = new byte[nextLength];
+                    buf.readBytes(fileNameByte);
+                    String fileName = new String(fileNameByte, "UTF-8");
+                    controller.setTfLogServer(LOGER + "запрашивается файл - " + fileName);
+                    if (Files.exists(Paths.get(clientPath.toString(), fileName))) {
+                        try {
+                            FileSender.sendFile(Paths.get(clientPath.toString(), fileName), ctx.channel(), future -> {
+                                if (!future.isSuccess()) {
+                                    future.cause().printStackTrace();
+                                }
+                                if (future.isSuccess()) {
+                                    System.out.println("Файл " + fileName + " успешно передан");
+                                }
+                            });
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            controller.setTfLogServer("Не удалось отправить файл " + fileName);
+                        }
+                    } else {
+                        controller.setTfLogServer("Такой файл не найден");
+                    }
+                    currentState = State.WAIT;
+                }
+            }
 //              Получаем длинну файла
             if (currentState == State.FILE_LENGTH) {
                 if (buf.readableBytes() >= 8) {
@@ -109,7 +142,7 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
 //              записываем файл
             if (currentState == State.FILE) {
                 while (buf.readableBytes() > 0) {
-                   // if (receivedFileLength % 100 == 0) controller.setTfLogServer("" + receivedFileLength * 0.01);
+                    // if (receivedFileLength % 100 == 0) controller.setTfLogServer("" + receivedFileLength * 0.01);
                     out.write(buf.readByte());
                     receivedFileLength++;
                     if (fileLength == receivedFileLength) {
@@ -189,10 +222,10 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
 
     }
 
-    private void sendFile(ChannelHandlerContext ctx,String fileName) {
+    private void sendFile(ChannelHandlerContext ctx, String fileName) {
         try {
             // обработка завершения передачи файла через листнер future
-            FileSender.sendFile(Paths.get(clientPath.toString(),fileName), ctx.channel(), future -> {
+            FileSender.sendFile(Paths.get(clientPath.toString(), fileName), ctx.channel(), future -> {
                 if (!future.isSuccess()) {
                     future.cause().printStackTrace();
                 }

@@ -1,5 +1,5 @@
-C:\Users\ABtan\OneDrive\CODDING\Java-programist\Java5Level\folder\filemanager\server\src\main\java\ru\abramov\filemanager\netty\server\ServerGUI.java
-C:\Users\ABtan\OneDrive\CODDING\Java-programist\Java5Level\folder\filemanager\server\src\main\java\ru\abramov\filemanager\netty\server\Controller.java
-C:\Users\ABtan\OneDrive\CODDING\Java-programist\Java5Level\folder\filemanager\server\src\main\java\ru\abramov\filemanager\netty\server\NettyServer.java
-C:\Users\ABtan\OneDrive\CODDING\Java-programist\Java5Level\folder\filemanager\server\src\main\java\ru\abramov\filemanager\netty\server\SqlClient.java
-C:\Users\ABtan\OneDrive\CODDING\Java-programist\Java5Level\folder\filemanager\server\src\main\java\ru\abramov\filemanager\netty\server\ByteProtocolHandler.java
+C:\Users\ABtan\OneDrive\CODDING\Java-programist\Java5Level\filemanager\server\src\main\java\ru\abramov\filemanager\netty\server\SqlClient.java
+C:\Users\ABtan\OneDrive\CODDING\Java-programist\Java5Level\filemanager\server\src\main\java\ru\abramov\filemanager\netty\server\ByteProtocolServerHandler.java
+C:\Users\ABtan\OneDrive\CODDING\Java-programist\Java5Level\filemanager\server\src\main\java\ru\abramov\filemanager\netty\server\NettyServer.java
+C:\Users\ABtan\OneDrive\CODDING\Java-programist\Java5Level\filemanager\server\src\main\java\ru\abramov\filemanager\netty\server\Controller.java
+C:\Users\ABtan\OneDrive\CODDING\Java-programist\Java5Level\filemanager\server\src\main\java\ru\abramov\filemanager\netty\server\ServerGUI.java

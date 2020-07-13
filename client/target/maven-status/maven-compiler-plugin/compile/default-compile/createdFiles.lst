@@ -3,7 +3,6 @@ ru\abramov\filemanager\controller\Main.class
 ru\abramov\filemanager\controller\PanelController$1.class
 ru\abramov\filemanager\controller\PanelController$2.class
 ru\abramov\filemanager\network\ByteProtocolHandler$State.class
-ru\abramov\filemanager\network\FileSender.class
 ru\abramov\filemanager\controller\PanelController.class
 ru\abramov\filemanager\network\ByteProtocolHandler$SignalByte.class
 ru\abramov\filemanager\network\ByteProtocolHandler.class

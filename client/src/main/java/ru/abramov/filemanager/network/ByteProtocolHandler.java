@@ -6,13 +6,16 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import ru.abramov.filemanager.controller.Controller;
 
 import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
 
     public enum State {
-        WAIT, NAME_LENGTH, NAME, FILE_LENGTH, FILE, NICKNAME_LENGTH, NICKNAME,FILE_LIST_LENGTH,FILELIST
+        WAIT, NAME_FILE_LENGTH, NAME, FILE_LENGTH, FILE, NICKNAME_LENGTH, NICKNAME, FILE_LIST_LENGTH, FILELIST
     }
 
     public enum SignalByte {
@@ -28,13 +31,13 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private static final String CLIENT = "CLIENT ByteProtocolHandler: ";
+    private static final String LOGER = "LOGER ByteProtocolHandler: ";
     private State currentState = State.WAIT;
     private int nextLength;
     private long fileLength;
     private long receivedFileLength;
     private BufferedOutputStream out;
-    private Path clientPath;
+    private Path clientPath = Paths.get("./");
 
 
     private String nickname;
@@ -45,7 +48,7 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println(CLIENT + "Client connect :" + ctx);
+        System.out.println(LOGER + "Client connect :" + ctx);
     }
 
     @Override
@@ -56,19 +59,19 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
             if (currentState == State.WAIT) {
                 byte signalByte = buf.readByte();
                 if (signalByte == SignalByte.GET_FILE.getActByte()) {
-                    currentState = State.NAME_LENGTH;
+                    currentState = State.NAME_FILE_LENGTH;
                     receivedFileLength = 0L;
-                    System.out.println(CLIENT + "Сигнальный байт =" + signalByte + " = копирование файла");
+                    System.out.println(LOGER + "Сигнальный байт =" + signalByte + " = копирование файла");
                 } else if (signalByte == SignalByte.AUTH.getActByte()) {
                     currentState = State.NICKNAME_LENGTH;
                     receivedFileLength = 0L;
-                    System.out.println(CLIENT + "Сигнальный байт = " + signalByte + " = авторизация");
+                    System.out.println(LOGER + "Сигнальный байт = " + signalByte + " = авторизация");
                 } else if (signalByte == SignalByte.SET_LIST_FILE.getActByte()) {
                     currentState = State.FILE_LIST_LENGTH;
                     receivedFileLength = 0L;
-                    System.out.println(CLIENT + "Сигнальный байт = " + signalByte + " = получение списка файлов");
+                    System.out.println(LOGER + "Сигнальный байт = " + signalByte + " = получение списка файлов");
                 } else {
-                    System.out.println(CLIENT + "Invalid first byte - " + signalByte);
+                    System.out.println(LOGER + "Invalid first byte - " + signalByte);
                 }
             }
 
@@ -81,18 +84,67 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
             getLengthFileList(buf);
 //            Получаем строку
             getFileList(buf);
+//            Получаем файл с сервера
+            getFileFromServer(buf);
+
         }
         if (buf.readableBytes() == 0) {
             buf.release();
         }
     }
 
+    private void getFileFromServer(ByteBuf buf) throws IOException {
+        //            Получаем длинну имени файла
+        if (currentState == State.NAME_FILE_LENGTH) {
+            if (buf.readableBytes() >= 4) {
+                System.out.println(LOGER + "Получаем длинну имени файла");
+                nextLength = buf.readInt();
+                System.out.println("" + nextLength);
+                currentState = State.NAME;
+            }
+        }
+//              Получаем имя файла и открываем поток прописывая новое имя файла
+        if (currentState == State.NAME) {
+            if (buf.readableBytes() >= nextLength) {
+                byte[] fileNameByte = new byte[nextLength];
+                buf.readBytes(fileNameByte);
+                String fileName = new String(fileNameByte, "UTF-8");
+                System.out.println(LOGER + "Получаем имя файла и открываем поток - " + fileName);
+                System.out.println(clientPath+fileName);
+                out = new BufferedOutputStream(new FileOutputStream( clientPath + fileName));
+                currentState = State.FILE_LENGTH;
+            }
+        }
+
+//            Получаем длинну файла
+        if (currentState == State.FILE_LENGTH) {
+            if (buf.readableBytes() >= 8) {
+                fileLength = buf.readLong();
+                System.out.println(LOGER + "Получаем длинну файла - " + fileLength);
+                currentState = State.FILE;
+            }
+        }
+//              записываем файл
+        if (currentState == State.FILE) {
+            while (buf.readableBytes() > 0) {
+                out.write(buf.readByte());
+                receivedFileLength++;
+                if (fileLength == receivedFileLength) {
+                    currentState = State.WAIT;
+                    System.out.println(LOGER + "Файл получен!");
+                    out.close();
+                    break;
+                }
+            }
+        }
+    }
+
     private void getLengthNickname(ByteBuf buf) {
         if (currentState == State.NICKNAME_LENGTH) {
             if (buf.readableBytes() >= 4) {
-                System.out.println(CLIENT + "Получаем длинну nickname");
+                System.out.println(LOGER + "Получаем длинну nickname");
                 nextLength = buf.readInt();
-                System.out.println(CLIENT + "Длинна nickname = " + nextLength);
+                System.out.println(LOGER + "Длинна nickname = " + nextLength);
                 currentState = State.NICKNAME;
             }
         }
@@ -104,7 +156,7 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
                 byte[] clientLoginBuf = new byte[nextLength];
                 buf.readBytes(clientLoginBuf);
                 nickname = new String(clientLoginBuf, "UTF-8");
-                System.out.println(CLIENT + "Получаем nickname =" + nickname);
+                System.out.println(LOGER + "Получаем nickname =" + nickname);
                 Controller.setNickname(nickname);
                 currentState = State.WAIT;
             }
@@ -114,9 +166,9 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
     private void getLengthFileList(ByteBuf buf) {
         if (currentState == State.FILE_LIST_LENGTH) {
             if (buf.readableBytes() >= 4) {
-                System.out.println(CLIENT + "Получаем длинну nickname");
+                System.out.println(LOGER + "Получаем длинну FILE_LIST_LENGTH");
                 nextLength = buf.readInt();
-                System.out.println(CLIENT + "Длинна nickname = " + nextLength);
+                System.out.println(LOGER + "Длинна FILE_LIST_LENGTH = " + nextLength);
                 currentState = State.FILELIST;
             }
         }
@@ -128,7 +180,7 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
                 byte[] clientLoginBuf = new byte[nextLength];
                 buf.readBytes(clientLoginBuf);
                 nickname = new String(clientLoginBuf, "UTF-8");
-                System.out.println(CLIENT + "Получаем nickname =" + nickname);
+                System.out.println(LOGER + "Получаем FILELIST =" + nickname);
                 currentState = State.WAIT;
             }
         }

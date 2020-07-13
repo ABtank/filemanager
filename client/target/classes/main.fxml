@@ -26,13 +26,19 @@
         <fx:include fx:id="panelServer" source="panel.fxml" HBox.hgrow="ALWAYS"/>
     </HBox>
     <HBox>
-        <Button maxWidth="Infinity" focusTraversable="false" text="Отправить файл" onAction="#sendFile" HBox.hgrow="ALWAYS"/>
         <Button maxWidth="Infinity" focusTraversable="false" onAction="#copyAction" text="Copy" HBox.hgrow="ALWAYS"/>
         <Button maxWidth="Infinity" focusTraversable="false" onAction="#moveAction" text="Move" HBox.hgrow="ALWAYS"/>
         <Button maxWidth="Infinity" focusTraversable="false" onAction="#deleteAction" text="Delete" HBox.hgrow="ALWAYS"/>
         <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
         </padding>
-
+    </HBox>
+    <HBox>
+        <Button maxWidth="Infinity" focusTraversable="false" text="Отправить файл" onAction="#sendFile" HBox.hgrow="ALWAYS"/>
+        <Button maxWidth="Infinity" focusTraversable="false" onAction="#requestFile" text="Скачать файл" HBox.hgrow="ALWAYS"/>
+        <Button maxWidth="Infinity" focusTraversable="false" onAction="#requestDeleteFile" text="Удалить на сервере" HBox.hgrow="ALWAYS"/>
+        <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+        </padding>
     </HBox>
 </VBox>

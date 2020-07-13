@@ -8,6 +8,8 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import ru.abramov.filemanager.common.FileSender;
+import ru.abramov.filemanager.common.SignalByte;
+import ru.abramov.filemanager.common.StringSender;
 import ru.abramov.filemanager.network.NettyClient;
 
 import java.io.IOException;
@@ -27,7 +29,7 @@ public class Controller implements Initializable {
     Label lbNickname;
 
     NettyClient nettyClient = LoginController.getNettyClient();
-    private static Path serverPath;
+    private static Path destination;
     private static String nickname;
 
     public static void setNickname(String nickname) {
@@ -58,12 +60,6 @@ public class Controller implements Initializable {
     public void menuItemFileExitAction(ActionEvent actionEvent) {
         nettyClient.close();
         Platform.exit();
-    }
-
-    public void filesListClicked(MouseEvent mouseEvent) {
-        if (mouseEvent.getClickCount() == 2) {
-
-        }
     }
 
     public void copyAction(ActionEvent actionEvent) {
@@ -195,8 +191,22 @@ public class Controller implements Initializable {
             });
         } catch (IOException e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Не удалось отправить файл" + serverPath.normalize().toAbsolutePath(), ButtonType.OK);
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Не удалось отправить файл", ButtonType.OK);
             alert.showAndWait();
         }
+    }
+
+    public void requestFile() {
+        PanelController clientPC = (PanelController) panelClient.getProperties().get("ctrl");
+        PanelController serverPC = (PanelController) panelServer.getProperties().get("ctrl");
+        destination = Paths.get(clientPC.getCurrentPath());
+        System.out.println("куда бы хотелость скопировать" + destination);
+        if (serverPC.getSelectedFileName() != null) {
+            StringSender.sendSignalByte(nettyClient.getChannel(), SignalByte.REQUEST_FILE);
+            StringSender.sendString(serverPC.getSelectedFileName(), nettyClient.getChannel());
+        }
+    }
+
+    public void requestDeleteFile(ActionEvent actionEvent) {
     }
 }
