@@ -1,4 +1,4 @@
-package ru.abramov.filemanager.network;
+package ru.abramov.filemanager.common;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;

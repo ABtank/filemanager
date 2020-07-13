@@ -4,6 +4,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import ru.abramov.filemanager.common.FileSender;
 import ru.abramov.filemanager.common.SignalByte;
 import ru.abramov.filemanager.common.StringSender;
 
@@ -17,7 +20,8 @@ import java.util.List;
 public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
 
     public enum State {
-        WAIT, NAME_LENGTH, NAME, FILE_LENGTH, FILE, LOGIN_LENGTH, LOGIN, PASSWORD_LENGTH, PASSWORD
+        WAIT, NAME_FILE_LENGTH, NAME, FILE_LENGTH, FILE,
+        LOGIN_LENGTH, LOGIN, PASSWORD_LENGTH, PASSWORD
     }
 
     public ByteProtocolHandler(Controller controller) {
@@ -61,21 +65,21 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
         while (buf.readableBytes() > 0) {
 //            Сигнальный байт
             if (currentState == State.WAIT) {
-                byte readed = buf.readByte();
-                if (readed == SignalByte.GET_FILE.getActByte()) {
-                    currentState = State.NAME_LENGTH;
+                byte signalByte = buf.readByte();
+                if (signalByte == SignalByte.GET_FILE.getActByte()) {
+                    currentState = State.NAME_FILE_LENGTH;
                     receivedFileLength = 0L;
-                    controller.setTfLogServer(LOGER + "Сигнальный байт =" + readed + " = копирование файла");
-                } else if (readed == SignalByte.AUTH.getActByte()) {
+                    controller.setTfLogServer(LOGER + "Сигнальный байт =" + signalByte + " = копирование файла");
+                } else if (signalByte == SignalByte.AUTH.getActByte()) {
                     currentState = State.LOGIN_LENGTH;
                     receivedFileLength = 0L;
-                    controller.setTfLogServer(LOGER + "Сигнальный байт = " + readed + " = авторизация");
+                    controller.setTfLogServer(LOGER + "Сигнальный байт = " + signalByte + " = авторизация");
                 } else {
-                    controller.setTfLogServer(LOGER + "Invalid first byte - " + readed);
+                    controller.setTfLogServer(LOGER + "Invalid first byte - " + signalByte);
                 }
             }
 //              Получаем длинну имени файла
-            if (currentState == State.NAME_LENGTH) {
+            if (currentState == State.NAME_FILE_LENGTH) {
                 if (buf.readableBytes() >= 4) {
                     controller.setTfLogServer(LOGER + "Получаем длинну имени файла");
                     nextLength = buf.readInt();
@@ -86,10 +90,11 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
 //              Получаем имя файла и открываем поток прописывая новое имя файла
             if (currentState == State.NAME) {
                 if (buf.readableBytes() >= nextLength) {
-                    byte[] fileName = new byte[nextLength];
-                    buf.readBytes(fileName);
-                    controller.setTfLogServer(LOGER + "Получаем имя файла и открываем поток прописывая новое имя файла - " + new String(fileName, "UTF-8"));
-                    out = new BufferedOutputStream(new FileOutputStream(clientPath + "\\" + stigma + new String(fileName)));
+                    byte[] fileNameByte = new byte[nextLength];
+                    buf.readBytes(fileNameByte);
+                    String fileName = new String(fileNameByte, "UTF-8");
+                    controller.setTfLogServer(LOGER + "Получаем имя файла и открываем поток прописывая новое имя файла - " + fileName);
+                    out = new BufferedOutputStream(new FileOutputStream(clientPath + "\\" + stigma + fileName));
                     currentState = State.FILE_LENGTH;
                 }
             }
@@ -182,6 +187,25 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
 
     public void getFilesList() {
 
+    }
+
+    private void sendFile(ChannelHandlerContext ctx,String fileName) {
+        try {
+            // обработка завершения передачи файла через листнер future
+            FileSender.sendFile(Paths.get(clientPath.toString(),fileName), ctx.channel(), future -> {
+                if (!future.isSuccess()) {
+                    future.cause().printStackTrace();
+                }
+                if (future.isSuccess()) {
+                    System.out.println("Файл " + fileName + " успешно передан");
+                    //serverPC.updateList(Paths.get(serverPC.getCurrentPath()));
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Не удалось отправить файл" + fileName, ButtonType.OK);
+            alert.showAndWait();
+        }
     }
 
     @Override

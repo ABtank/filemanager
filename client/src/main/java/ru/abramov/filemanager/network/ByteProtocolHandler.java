@@ -54,21 +54,21 @@ public class ByteProtocolHandler extends ChannelInboundHandlerAdapter {
         while (buf.readableBytes() > 0) {
 //            Сигнальный байт
             if (currentState == State.WAIT) {
-                byte readed = buf.readByte();
-                if (readed == SignalByte.GET_FILE.getActByte()) {
+                byte signalByte = buf.readByte();
+                if (signalByte == SignalByte.GET_FILE.getActByte()) {
                     currentState = State.NAME_LENGTH;
                     receivedFileLength = 0L;
-                    System.out.println(CLIENT + "Сигнальный байт =" + readed + " = копирование файла");
-                } else if (readed == SignalByte.AUTH.getActByte()) {
+                    System.out.println(CLIENT + "Сигнальный байт =" + signalByte + " = копирование файла");
+                } else if (signalByte == SignalByte.AUTH.getActByte()) {
                     currentState = State.NICKNAME_LENGTH;
                     receivedFileLength = 0L;
-                    System.out.println(CLIENT + "Сигнальный байт = " + readed + " = авторизация");
-                } else if (readed == SignalByte.SET_LIST_FILE.getActByte()) {
+                    System.out.println(CLIENT + "Сигнальный байт = " + signalByte + " = авторизация");
+                } else if (signalByte == SignalByte.SET_LIST_FILE.getActByte()) {
                     currentState = State.FILE_LIST_LENGTH;
                     receivedFileLength = 0L;
-                    System.out.println(CLIENT + "Сигнальный байт = " + readed + " = получение списка файлов");
+                    System.out.println(CLIENT + "Сигнальный байт = " + signalByte + " = получение списка файлов");
                 } else {
-                    System.out.println(CLIENT + "Invalid first byte - " + readed);
+                    System.out.println(CLIENT + "Invalid first byte - " + signalByte);
                 }
             }
 

@@ -7,8 +7,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import ru.abramov.filemanager.network.FileSender;
+import ru.abramov.filemanager.common.FileSender;
 import ru.abramov.filemanager.network.NettyClient;
 
 import java.io.IOException;
