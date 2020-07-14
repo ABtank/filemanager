@@ -42,7 +42,7 @@ public class LoginController implements Initializable {
     }
 
     public void exit(ActionEvent actionEvent) {
-        nettyClient.close();
+        if(nettyClient!=null)nettyClient.close();
         Platform.exit();
     }
 }

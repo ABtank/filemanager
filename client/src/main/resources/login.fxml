@@ -6,12 +6,12 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="sceneLogin" alignment="CENTER" prefHeight="600" prefWidth="1024" xmlns="http://javafx.com/javafx/8.0.999-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.abramov.filemanager.controller.LoginController" stylesheets="styles.css">
+<VBox  fx:id="sceneLogin" alignment="CENTER" style="-fx-background-image: url(bg-login.jpg);" prefHeight="600" prefWidth="1024" xmlns="http://javafx.com/javafx/8.0.999-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.abramov.filemanager.controller.LoginController" stylesheets="styles.css">
     <VBox alignment="CENTER" prefHeight="149.0" prefWidth="300.0" spacing="20.0">
-        <TextField fx:id="tfHost" text="localhost" focusTraversable="false" alignment="CENTER" promptText="enter IP address" />
-        <TextField fx:id="tfNickname" focusTraversable="false" alignment="CENTER" promptText="if registered, set nickname" />
-        <TextField fx:id="tfLogin" text="Iurii" alignment="CENTER" promptText="Login" />
-        <PasswordField fx:id="pfPassword" text="123" alignment="CENTER" promptText="********" prefHeight="25.0" prefWidth="512.0" />
+        <TextField fx:id="tfHost" styleClass="r-field" text="localhost" focusTraversable="false" alignment="CENTER" promptText="enter IP address" />
+        <TextField fx:id="tfNickname" styleClass="r-field" focusTraversable="false" alignment="CENTER" promptText="if registered, set nickname" />
+        <TextField fx:id="tfLogin" styleClass="r-field" text="Iurii" alignment="CENTER" promptText="Login" />
+        <PasswordField fx:id="pfPassword" styleClass="r-field" text="123" alignment="CENTER" promptText="********" prefHeight="25.0" prefWidth="512.0" />
         <Button styleClass="r-button" prefHeight="60.0" prefWidth="400.0" text="Connect" onAction="#connect" />
         <Button styleClass="r-button" prefHeight="60.0" prefWidth="600.0" text="Registration" onAction="#registration" />
         <Button styleClass="r-button" prefHeight="60.0" prefWidth="200.0" text="Close" onAction="#exit" />

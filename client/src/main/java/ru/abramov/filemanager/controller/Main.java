@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.IOException;
 
@@ -15,6 +16,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception{
         scene = new Scene(loadFXML("/login"));
+        stage.initStyle(StageStyle.TRANSPARENT);
         stage.setTitle("File Manager");
         stage.setScene(scene);
         stage.show();

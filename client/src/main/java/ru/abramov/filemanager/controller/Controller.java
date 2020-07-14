@@ -2,11 +2,13 @@ package ru.abramov.filemanager.controller;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import ru.abramov.filemanager.common.FileSender;
 import ru.abramov.filemanager.common.SignalByte;
 import ru.abramov.filemanager.common.StringSender;
@@ -27,6 +29,8 @@ public class Controller implements Initializable {
     VBox panelClient, panelServer;
     @FXML
     Label lbNickname;
+    @FXML
+    VBox mainVBox;
 
     NettyClient nettyClient = LoginController.getNettyClient();
     private static Path destination;
@@ -42,6 +46,7 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        initializeWindowDragAndDropLabel();
         //1)Получаю никнейм и зааписываю в
         int i = 0;
         while (nickname == null) {
@@ -217,5 +222,29 @@ public class Controller implements Initializable {
             StringSender.sendSignalByte(nettyClient.getChannel(), SignalByte.REQUEST_DELETE_FILE);
             StringSender.sendString(serverPC.getSelectedFileName(), nettyClient.getChannel());
         }
+    }
+
+    double dragDeltaX, dragDeltaY;
+
+    public void initializeWindowDragAndDropLabel() {
+        Platform.runLater(() -> {
+            Stage stage = (Stage) mainVBox.getScene().getWindow();
+
+            lbNickname.setOnMousePressed(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    // record a delta distance for the drag and drop operation.
+                    dragDeltaX = stage.getX() - mouseEvent.getScreenX();
+                    dragDeltaY = stage.getY() - mouseEvent.getScreenY();
+                }
+            });
+            lbNickname.setOnMouseDragged(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    stage.setX(mouseEvent.getScreenX() + dragDeltaX);
+                    stage.setY(mouseEvent.getScreenY() + dragDeltaY);
+                }
+            });
+        });
     }
 }

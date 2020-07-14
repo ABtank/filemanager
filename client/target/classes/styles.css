@@ -2,6 +2,9 @@
     -fx-font-family: Monospaced;
     -fx-font-size: 42.0;
     -fx-text-fill: #F00;
+    -fx-background-color: linear-gradient(#efd100 0, #e2a233 38%, #f0c328 60%, #fff1a3 86%, #ffe13e 100%);
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
 }
 
 .r-button: odd{
@@ -10,4 +13,17 @@
 
 .r-button: selected{
     -fx-background-color: #37F;
+}
+
+.r-field{
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+}
+
+.n-label{
+    -fx-border-radius: 20 0 0 20;
+    -fx-background-color: linear-gradient(#efd100 0, #e2a233 38%, #f0c328 60%, #fff1a3 86%, #ffe13e 100%);
+    -fx-font-size: 16.0;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
 }
