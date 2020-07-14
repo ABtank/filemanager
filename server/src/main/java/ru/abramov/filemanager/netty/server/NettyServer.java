@@ -14,7 +14,7 @@ import java.nio.file.Paths;
 public class NettyServer {
     private static final int PORT = 8189;
     private static Path serverPath;
-    private Controller controller;
+    private static Controller controller;
     private static Thread t;
 
     public static Path getServerPath() {
@@ -57,6 +57,7 @@ public class NettyServer {
     }
 
     public static void close(){
+        controller.setTfLogServer("Server stop");
         t.interrupt();
     }
 }

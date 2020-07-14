@@ -14,7 +14,6 @@
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.abramov.filemanager.controller.Controller" stylesheets="styles.css">
 
    <Label fx:id="lbNickname" text="" textAlignment="CENTER" maxWidth="Infinity" alignment="CENTER"/>
-
     <MenuBar>
         <Menu text="File">
             <MenuItem text="Выйти из программы" onAction="#menuItemFileExitAction"/>
@@ -24,21 +23,28 @@
     <HBox VBox.vgrow="ALWAYS">
         <fx:include fx:id="panelClient" source="panel.fxml" HBox.hgrow="ALWAYS"/>
         <fx:include fx:id="panelServer" source="panel.fxml" HBox.hgrow="ALWAYS"/>
-    </HBox>
-    <HBox>
-        <Button maxWidth="Infinity" focusTraversable="false" onAction="#copyAction" text="Copy" HBox.hgrow="ALWAYS"/>
-        <Button maxWidth="Infinity" focusTraversable="false" onAction="#moveAction" text="Move" HBox.hgrow="ALWAYS"/>
-        <Button maxWidth="Infinity" focusTraversable="false" onAction="#deleteAction" text="Delete" HBox.hgrow="ALWAYS"/>
         <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
         </padding>
     </HBox>
     <HBox>
-        <Button maxWidth="Infinity" focusTraversable="false" text="Отправить файл" onAction="#sendFile" HBox.hgrow="ALWAYS"/>
-        <Button maxWidth="Infinity" focusTraversable="false" onAction="#requestFile" text="Скачать файл" HBox.hgrow="ALWAYS"/>
-        <Button maxWidth="Infinity" focusTraversable="false" onAction="#requestDeleteFile" text="Удалить на сервере" HBox.hgrow="ALWAYS"/>
-        <padding>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-        </padding>
+        <VBox maxWidth="Infinity" HBox.hgrow="ALWAYS">
+            <Label text="LOCAL BUTTON" textAlignment="CENTER" maxWidth="Infinity" alignment="CENTER"/>
+            <Button maxWidth="Infinity" focusTraversable="false" onAction="#copyAction" text="Copy" HBox.hgrow="ALWAYS"/>
+            <Button maxWidth="Infinity" focusTraversable="false" onAction="#moveAction" text="Move" HBox.hgrow="ALWAYS"/>
+            <Button maxWidth="Infinity" focusTraversable="false" onAction="#deleteAction" text="Delete" HBox.hgrow="ALWAYS"/>
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </VBox>
+        <VBox maxWidth="Infinity" HBox.hgrow="ALWAYS">
+        <Label text="NETWORK BUTTON" textAlignment="CENTER" maxWidth="Infinity" alignment="CENTER"/>
+            <Button maxWidth="Infinity" focusTraversable="false" text="Отправить файл" onAction="#sendFile" HBox.hgrow="ALWAYS"/>
+            <Button maxWidth="Infinity" focusTraversable="false" onAction="#requestFile" text="Скачать файл" HBox.hgrow="ALWAYS"/>
+            <Button maxWidth="Infinity" focusTraversable="false" onAction="#requestDeleteFile" text="Удалить на сервере" HBox.hgrow="ALWAYS"/>
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </VBox>
     </HBox>
 </VBox>

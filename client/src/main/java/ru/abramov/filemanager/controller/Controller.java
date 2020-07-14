@@ -208,5 +208,10 @@ public class Controller implements Initializable {
     }
 
     public void requestDeleteFile(ActionEvent actionEvent) {
+        PanelController serverPC = (PanelController) panelServer.getProperties().get("ctrl");
+        if (serverPC.getSelectedFileName() != null) {
+            StringSender.sendSignalByte(nettyClient.getChannel(), SignalByte.REQUEST_DELETE_FILE);
+            StringSender.sendString(serverPC.getSelectedFileName(), nettyClient.getChannel());
+        }
     }
 }

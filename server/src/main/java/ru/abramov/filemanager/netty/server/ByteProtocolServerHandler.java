@@ -21,8 +21,9 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
 
     public enum State {
         WAIT,
-        NAME_FILE_LENGTH, NAME, FILE_LENGTH, FILE,
-        REQUEST_NAME_FILE_LENGTH, REQUEST_NAME_FILE,
+        NAME_FILE_LENGTH_FO_GET, NAME, FILE_LENGTH, FILE,
+        NAME_FILE_LENGTH_FO_SEND, SEND_FILE,
+        NAME_FILE_LENGTH_FO_DELETE, DELETE_FILE,
         LOGIN_LENGTH, LOGIN, PASSWORD_LENGTH, PASSWORD
     }
 
@@ -68,7 +69,7 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
             if (currentState == State.WAIT) {
                 byte signalByte = buf.readByte();
                 if (signalByte == SignalByte.GET_FILE.getActByte()) {
-                    currentState = State.NAME_FILE_LENGTH;
+                    currentState = State.NAME_FILE_LENGTH_FO_GET;
                     receivedFileLength = 0L;
                     controller.setTfLogServer(LOGER + "Сигнальный байт =" + signalByte + " = копирование файла");
                 } else if (signalByte == SignalByte.AUTH.getActByte()) {
@@ -76,22 +77,30 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
                     receivedFileLength = 0L;
                     controller.setTfLogServer(LOGER + "Сигнальный байт = " + signalByte + " = авторизация");
                 } else if (signalByte == SignalByte.REQUEST_FILE.getActByte()) {
-                    currentState = State.REQUEST_NAME_FILE_LENGTH;
+                    currentState = State.NAME_FILE_LENGTH_FO_SEND;
                     receivedFileLength = 0L;
-                    controller.setTfLogServer(LOGER + "Сигнальный байт = " + signalByte + " = запрос файла");
+                    controller.setTfLogServer(LOGER + "Сигнальный байт = " + signalByte + " = запрос на отправку файла");
+                } else if (signalByte == SignalByte.REQUEST_DELETE_FILE.getActByte()) {
+                    currentState = State.NAME_FILE_LENGTH_FO_DELETE;
+                    receivedFileLength = 0L;
+                    controller.setTfLogServer(LOGER + "Сигнальный байт = " + signalByte + " = запрос удаления файла");
                 } else {
                     controller.setTfLogServer(LOGER + "Invalid first byte - " + signalByte);
                 }
             }
 //              Получаем длинну имени файла
-            if (currentState == State.NAME_FILE_LENGTH || currentState == State.REQUEST_NAME_FILE_LENGTH) {
+            if (currentState == State.NAME_FILE_LENGTH_FO_GET
+                    || currentState == State.NAME_FILE_LENGTH_FO_SEND
+                    || currentState == State.NAME_FILE_LENGTH_FO_DELETE) {
                 if (buf.readableBytes() >= 4) {
                     controller.setTfLogServer(LOGER + "Получаем длинну имени файла");
                     nextLength = buf.readInt();
                     controller.setTfLogServer("" + nextLength);
-                    if (currentState == State.NAME_FILE_LENGTH) {
+                    if (currentState == State.NAME_FILE_LENGTH_FO_GET) {
                         currentState = State.NAME;
-                    } else currentState = State.REQUEST_NAME_FILE;
+                    } else if (currentState == State.NAME_FILE_LENGTH_FO_DELETE) {
+                        currentState = State.DELETE_FILE;
+                    } else currentState = State.SEND_FILE;
                 }
             }
 //              Получаем имя файла и открываем поток прописывая новое имя файла
@@ -105,7 +114,28 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
                     currentState = State.FILE_LENGTH;
                 }
             }
-            if (currentState == State.REQUEST_NAME_FILE) {
+
+            if (currentState == State.DELETE_FILE) {
+                if (buf.readableBytes() >= nextLength) {
+                    byte[] fileNameByte = new byte[nextLength];
+                    buf.readBytes(fileNameByte);
+                    String fileName = new String(fileNameByte, "UTF-8");
+                    controller.setTfLogServer(LOGER + "запрашивается файл - " + fileName);
+                    Path path = Paths.get(clientPath.toString(), fileName);
+                    controller.setTfLogServer(path.toString());
+                    if (Files.exists(path)) {
+                        if (!Files.isDirectory(path)) {
+                            Files.delete(path);
+                            controller.setTfLogServer(fileName + " удален");
+                        }
+                    } else {
+                        controller.setTfLogServer("Файл на удаление не найден");
+                    }
+                    currentState = State.WAIT;
+                }
+            }
+
+            if (currentState == State.SEND_FILE) {
                 if (buf.readableBytes() >= nextLength) {
                     byte[] fileNameByte = new byte[nextLength];
                     buf.readBytes(fileNameByte);
