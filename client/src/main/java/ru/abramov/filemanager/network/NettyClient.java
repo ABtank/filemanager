@@ -29,7 +29,7 @@ public class NettyClient {
                             @Override
                             protected void initChannel(SocketChannel socketChannel) throws Exception {
                                 channel = socketChannel;
-                                socketChannel.pipeline().addLast(new ByteProtocolHandler()
+                                socketChannel.pipeline().addLast(new ByteProtocolClientHandler()
                                 );
                             }
                         });
