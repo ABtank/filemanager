@@ -32,6 +32,10 @@ public class Controller implements Initializable {
     private static Path destination;
     private static String nickname;
 
+    public static Path getDestination() {
+        return destination;
+    }
+
     public static void setNickname(String nickname) {
         Controller.nickname = nickname;
     }

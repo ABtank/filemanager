@@ -110,8 +110,9 @@ public class ByteProtocolClientHandler extends ChannelInboundHandlerAdapter {
                 buf.readBytes(fileNameByte);
                 String fileName = new String(fileNameByte, "UTF-8");
                 System.out.println(LOGER + "Получаем имя файла и открываем поток - " + fileName);
-                System.out.println(clientPath+fileName);
-                out = new BufferedOutputStream(new FileOutputStream( clientPath + fileName));
+                clientPath = Controller.getDestination();
+                System.out.println(clientPath + fileName);
+                out = new BufferedOutputStream(new FileOutputStream(clientPath +"\\"+ fileName));
                 currentState = State.FILE_LENGTH;
             }
         }
