@@ -4,8 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
+import ru.abramov.filemanager.common.FileInfo;
 import ru.abramov.filemanager.common.FileSender;
 import ru.abramov.filemanager.common.SignalByte;
 import ru.abramov.filemanager.common.StringSender;
@@ -15,7 +14,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
 
@@ -127,6 +128,7 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
                         if (!Files.isDirectory(path)) {
                             Files.delete(path);
                             controller.setTfLogServer(fileName + " удален");
+                            updateFilesList(ctx, clientPath);
                         }
                     } else {
                         controller.setTfLogServer("Файл на удаление не найден");
@@ -149,6 +151,7 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
                                 }
                                 if (future.isSuccess()) {
                                     System.out.println("Файл " + fileName + " успешно передан");
+                                    updateFilesList(ctx, clientPath);
                                 }
                             });
                         } catch (IOException e) {
@@ -178,6 +181,7 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
                     if (fileLength == receivedFileLength) {
                         currentState = State.WAIT;
                         controller.setTfLogServer(LOGER + "Файл получен!");
+                        updateFilesList(ctx, clientPath);
                         out.close();
                         break;
                     }
@@ -232,8 +236,7 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
                             Files.createDirectory(clientPath);
                         }
                         NettyServer.setServerPath(clientPath);
-                        getFilesList();
-                        StringSender.sendFileList(clientPath.toString(), ctx.channel());
+                        updateFilesList(ctx, clientPath);
                     } else {
                         ctx.channel().close();
                         controller.setTfLogServer(LOGER + "ctx.channel().isActive()" + ctx.channel().isActive());
@@ -248,26 +251,24 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    public void getFilesList() {
 
-    }
-
-    private void sendFile(ChannelHandlerContext ctx, String fileName) {
+    public void updateFilesList(ChannelHandlerContext ctx, Path path) {
         try {
-            // обработка завершения передачи файла через листнер future
-            FileSender.sendFile(Paths.get(clientPath.toString(), fileName), ctx.channel(), future -> {
-                if (!future.isSuccess()) {
-                    future.cause().printStackTrace();
+            List<FileInfo> list = Files.list(path).map(FileInfo::new).collect(Collectors.toList());
+            if (list.size() > 0) {
+                Iterator iterator = list.iterator();
+                StringBuilder stringListFileInfo = new StringBuilder();
+                StringSender.sendSignalByte(ctx.channel(), SignalByte.UPDATE_LIST_SERVER);
+                controller.setTfLogServer(SignalByte.UPDATE_LIST_SERVER.toString());
+                while (iterator.hasNext()) {
+                    stringListFileInfo.append(iterator.next().toString());
                 }
-                if (future.isSuccess()) {
-                    System.out.println("Файл " + fileName + " успешно передан");
-                    //serverPC.updateList(Paths.get(serverPC.getCurrentPath()));
-                }
-            });
+                System.out.println(stringListFileInfo);
+                controller.setTfLogServer("Отправка нового списка файлов - " + stringListFileInfo);
+                StringSender.sendString(String.valueOf(stringListFileInfo), ctx.channel());
+            }
         } catch (IOException e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Не удалось отправить файл" + fileName, ButtonType.OK);
-            alert.showAndWait();
         }
     }
 

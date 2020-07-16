@@ -8,11 +8,14 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import ru.abramov.filemanager.common.FileInfo;
+import ru.abramov.filemanager.network.ByteProtocolClientHandler;
 
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.*;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -29,9 +32,9 @@ public class PanelController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        TableColumn<FileInfo, String> fileTypeColumn = new TableColumn<>("Type");
-        fileTypeColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getType().getName())); // D или F
-        fileTypeColumn.setPrefWidth(60); //базовая длинна
+//        TableColumn<FileInfo, String> fileTypeColumn = new TableColumn<>("Type");
+//        fileTypeColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getType().getName())); // D или F
+//        fileTypeColumn.setPrefWidth(60); //базовая длинна
 
         TableColumn<FileInfo, String> fileNameColumn = new TableColumn<>("Name");
         fileNameColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getFileName())); // D или F
@@ -63,14 +66,14 @@ public class PanelController implements Initializable {
 
         // ---посл модификации ---
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:ss");
-        TableColumn<FileInfo, String> fileDateColumn = new TableColumn<>("Date change");
-        fileDateColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getLastModified().format(dtf))); // D или F
-        fileDateColumn.setPrefWidth(120); //базовая длинна
+//        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:ss");
+//        TableColumn<FileInfo, String> fileDateColumn = new TableColumn<>("Date change");
+//        fileDateColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getLastModified().format(dtf))); // D или F
+//        fileDateColumn.setPrefWidth(120); //базовая длинна
 
-        filesTable.getColumns().addAll(fileTypeColumn, fileNameColumn, fileSizeColumn, fileDateColumn);
+        filesTable.getColumns().addAll(fileNameColumn, fileSizeColumn);
 
-        filesTable.getSortOrder().add(fileTypeColumn); // сортировка
+        filesTable.getSortOrder().add(fileSizeColumn); // сортировка
 
         // ---Получаем список дисков ---
         diskBox.getItems().clear(); // очищаем
@@ -108,6 +111,12 @@ public class PanelController implements Initializable {
             Alert alert = new Alert(Alert.AlertType.WARNING, "Список файлов не получается обновить "+ path, ButtonType.OK);
             alert.showAndWait();
         }
+    }
+
+    public void serverListUpdate(List<FileInfo> list) {
+        pathField.setText("Server");
+        filesTable.getItems().clear(); // сначала чистим список
+        filesTable.getItems().addAll(list);
     }
 
     public void btnPathUpAction(ActionEvent actionEvent) {

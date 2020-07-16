@@ -3,6 +3,7 @@ package ru.abramov.filemanager.network;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import ru.abramov.filemanager.common.FileInfo;
 import ru.abramov.filemanager.controller.Controller;
 
 import java.io.BufferedOutputStream;
@@ -11,6 +12,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ByteProtocolClientHandler extends ChannelInboundHandlerAdapter {
 
@@ -19,7 +22,8 @@ public class ByteProtocolClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     public enum SignalByte {
-        GET_FILE((byte) 32), AUTH((byte) 22), SET_LIST_FILE((byte) 11);
+        GET_FILE((byte) 32), AUTH((byte) 22),
+        UPDATE_LIST_SERVER((byte)321);
         private byte act;
 
         SignalByte(byte act) {
@@ -31,6 +35,7 @@ public class ByteProtocolClientHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+    private static Controller controller;
     private static final String LOGER = "LOGER ByteProtocolClientHandler: ";
     private State currentState = State.WAIT;
     private int nextLength;
@@ -44,6 +49,10 @@ public class ByteProtocolClientHandler extends ChannelInboundHandlerAdapter {
 
     public String getNickname() {
         return nickname;
+    }
+
+    public static void setController(Controller controller) {
+        ByteProtocolClientHandler.controller = controller;
     }
 
     @Override
@@ -66,10 +75,11 @@ public class ByteProtocolClientHandler extends ChannelInboundHandlerAdapter {
                     currentState = State.NICKNAME_LENGTH;
                     receivedFileLength = 0L;
                     System.out.println(LOGER + "Сигнальный байт = " + signalByte + " = авторизация");
-                } else if (signalByte == SignalByte.SET_LIST_FILE.getActByte()) {
+                } else if (signalByte == SignalByte.UPDATE_LIST_SERVER.getActByte()) {
+                    System.out.println(SignalByte.UPDATE_LIST_SERVER.toString());
                     currentState = State.FILE_LIST_LENGTH;
                     receivedFileLength = 0L;
-                    System.out.println(LOGER + "Сигнальный байт = " + signalByte + " = получение списка файлов");
+                    System.out.println(LOGER + "Сигнальный байт = " + signalByte + " = добавить в список сервера FileInfo");
                 } else {
                     System.out.println(LOGER + "Invalid first byte - " + signalByte);
                 }
@@ -83,7 +93,7 @@ public class ByteProtocolClientHandler extends ChannelInboundHandlerAdapter {
 //            Получаем длинну слроки
             getLengthFileList(buf);
 //            Получаем строку
-            getFileList(buf);
+            getFileInfoToList(buf);
 //            Получаем файл с сервера
             getFileFromServer(buf);
 
@@ -170,18 +180,29 @@ public class ByteProtocolClientHandler extends ChannelInboundHandlerAdapter {
                 System.out.println(LOGER + "Получаем длинну FILE_LIST_LENGTH");
                 nextLength = buf.readInt();
                 System.out.println(LOGER + "Длинна FILE_LIST_LENGTH = " + nextLength);
+                if(nextLength == 0) currentState = State.WAIT;
                 currentState = State.FILELIST;
             }
         }
     }
 
-    private void getFileList(ByteBuf buf) throws UnsupportedEncodingException {
+    private void getFileInfoToList(ByteBuf buf) throws UnsupportedEncodingException {
         if (currentState == State.FILELIST) {
             if (buf.readableBytes() >= nextLength) {
-                byte[] clientLoginBuf = new byte[nextLength];
-                buf.readBytes(clientLoginBuf);
-                nickname = new String(clientLoginBuf, "UTF-8");
-                System.out.println(LOGER + "Получаем FILELIST =" + nickname);
+                byte[] ListFileInfoByte = new byte[nextLength];
+                buf.readBytes(ListFileInfoByte);
+                String fileInfoString = new String(ListFileInfoByte, "UTF-8");
+                String[]strArr = fileInfoString.split("\n");
+                List<FileInfo> fileInfoList = new ArrayList<>();
+                for (int i = 0; i <strArr.length ; i++) {
+                    String arr[]=strArr[i].split(" ");
+                    FileInfo fileInfo = new FileInfo();
+                    fileInfo.setFileName(arr[0]);
+                    fileInfo.setSize(Long.parseLong(arr[1]));
+                    fileInfoList.add(fileInfo);
+                }
+                System.out.println(LOGER + "Получаем FILEINFOLIST =" + fileInfoList);
+                controller.serverListUpdate(fileInfoList);
                 currentState = State.WAIT;
             }
         }

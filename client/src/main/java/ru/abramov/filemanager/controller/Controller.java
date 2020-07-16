@@ -9,9 +9,11 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import ru.abramov.filemanager.common.FileInfo;
 import ru.abramov.filemanager.common.FileSender;
 import ru.abramov.filemanager.common.SignalByte;
 import ru.abramov.filemanager.common.StringSender;
+import ru.abramov.filemanager.network.ByteProtocolClientHandler;
 import ru.abramov.filemanager.network.NettyClient;
 
 import java.io.IOException;
@@ -20,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.ResourceBundle;
 
 
@@ -46,6 +49,7 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        ByteProtocolClientHandler.setController(this);
         initializeWindowDragAndDropLabel();
         //1)Получаю никнейм и зааписываю в
         int i = 0;
@@ -209,7 +213,6 @@ public class Controller implements Initializable {
         PanelController clientPC = (PanelController) panelClient.getProperties().get("ctrl");
         PanelController serverPC = (PanelController) panelServer.getProperties().get("ctrl");
         destination = Paths.get(clientPC.getCurrentPath());
-        System.out.println("куда бы хотелость скопировать" + destination);
         if (serverPC.getSelectedFileName() != null) {
             StringSender.sendSignalByte(nettyClient.getChannel(), SignalByte.REQUEST_FILE);
             StringSender.sendString(serverPC.getSelectedFileName(), nettyClient.getChannel());
@@ -246,5 +249,11 @@ public class Controller implements Initializable {
                 }
             });
         });
+    }
+
+    public void serverListUpdate(List<FileInfo> list) {
+        PanelController serverPC = (PanelController) panelServer.getProperties().get("ctrl");
+        serverPC.serverListUpdate(list);
+        System.out.println("Update Server panel");
     }
 }

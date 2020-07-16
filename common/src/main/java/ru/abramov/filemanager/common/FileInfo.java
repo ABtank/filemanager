@@ -1,4 +1,4 @@
-package ru.abramov.filemanager.controller;
+package ru.abramov.filemanager.common;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -6,8 +6,13 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 public class FileInfo {
+    public FileInfo() {
+
+    }
+
     public enum FileType{
         FILE("F"), DIRECTORY("D");
 
@@ -73,5 +78,8 @@ public class FileInfo {
             throw new RuntimeException("Unable to create file info from path");
         }
     }
-
+    @Override
+    public String toString() {
+        return fileName + " " + size+"\n";
+    }
 }
