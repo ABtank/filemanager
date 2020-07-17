@@ -176,7 +176,7 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
 //              записываем файл
             if (currentState == State.FILE) {
                 while (buf.readableBytes() > 0) {
-                    // if (receivedFileLength % 100 == 0) controller.setTfLogServer("" + receivedFileLength * 0.01);
+                    //if (receivedFileLength % 100 == 0) controller.setTfLogServer("" + receivedFileLength * 0.01);
                     out.write(buf.readByte());
                     receivedFileLength++;
                     if (fileLength == receivedFileLength) {
@@ -268,6 +268,8 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
                 controller.setTfLogServer("Отправка нового списка файлов - " + stringListFileInfo);
                 StringSender.sendString(String.valueOf(stringListFileInfo), ctx.channel());
                 currentState = State.WAIT;
+            } else {
+               StringSender.sendSignalByte(ctx.channel(), SignalByte.CLEAR_LIST_SERVER);
             }
         } catch (IOException e) {
             e.printStackTrace();

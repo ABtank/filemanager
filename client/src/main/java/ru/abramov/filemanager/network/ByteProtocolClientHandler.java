@@ -23,7 +23,8 @@ public class ByteProtocolClientHandler extends ChannelInboundHandlerAdapter {
 
     public enum SignalByte {
         GET_FILE((byte) 32), AUTH((byte) 22),
-        UPDATE_LIST_SERVER((byte)321);
+        UPDATE_LIST_SERVER((byte)321),
+        CLEAR_LIST_SERVER((byte) 666);
         private byte act;
 
         SignalByte(byte act) {
@@ -80,7 +81,12 @@ public class ByteProtocolClientHandler extends ChannelInboundHandlerAdapter {
                     currentState = State.FILE_LIST_LENGTH;
                     receivedFileLength = 0L;
                     System.out.println(LOGER + "Сигнальный байт = " + signalByte + " = добавить в список сервера FileInfo");
-                } else {
+                }  else if (signalByte == SignalByte.CLEAR_LIST_SERVER.getActByte()) {
+                    System.out.println(SignalByte.CLEAR_LIST_SERVER.toString());
+                    currentState = State.WAIT;
+                    controller.serverListClear();
+                    System.out.println(LOGER + "Сигнальный байт = " + signalByte + " = добавить в список сервера FileInfo");
+                }else {
                     System.out.println(LOGER + "Invalid first byte - " + signalByte);
                 }
             }
@@ -144,6 +150,7 @@ public class ByteProtocolClientHandler extends ChannelInboundHandlerAdapter {
                     currentState = State.WAIT;
                     System.out.println(LOGER + "Файл получен!");
                     out.close();
+                    controller.clientListUpdate();
                     break;
                 }
             }
@@ -180,7 +187,10 @@ public class ByteProtocolClientHandler extends ChannelInboundHandlerAdapter {
                 System.out.println(LOGER + "Получаем длинну FILE_LIST_LENGTH");
                 nextLength = buf.readInt();
                 System.out.println(LOGER + "Длинна FILE_LIST_LENGTH = " + nextLength);
-                if(nextLength == 0) currentState = State.WAIT;
+                if(nextLength == 0) {
+                    controller.serverListClear();
+                    currentState = State.WAIT;
+                }
                 currentState = State.FILELIST;
             }
         }

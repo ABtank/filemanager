@@ -64,8 +64,6 @@ public class Controller implements Initializable {
         lbNickname.setText("Hello " + nickname);
         Path serverPath = Paths.get("./", nickname);
         System.out.println(serverPath);
-        PanelController serverPC = (PanelController) panelServer.getProperties().get("ctrl");
-        serverPC.updateList(serverPath.normalize().toAbsolutePath());
         System.out.println("run fxml main");
     }
 
@@ -199,7 +197,6 @@ public class Controller implements Initializable {
                 }
                 if (future.isSuccess()) {
                     System.out.println("Файл " + clientPC.getSelectedFileName() + " успешно передан");
-                    serverPC.updateList(Paths.get(serverPC.getCurrentPath()));
                 }
             });
         } catch (IOException e) {
@@ -255,5 +252,16 @@ public class Controller implements Initializable {
         PanelController serverPC = (PanelController) panelServer.getProperties().get("ctrl");
         serverPC.serverListUpdate(list);
         System.out.println("Update Server panel");
+    }
+
+    public void serverListClear(){
+        PanelController serverPC = (PanelController) panelServer.getProperties().get("ctrl");
+        serverPC.serverListClear();
+    }
+
+    public void clientListUpdate(){
+        PanelController clientPC = (PanelController) panelClient.getProperties().get("ctrl");
+        System.out.println("clientListUpdate - "+Paths.get(clientPC.getCurrentPath()));
+        clientPC.updateList(Paths.get(clientPC.getCurrentPath()));
     }
 }

@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
+
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -29,13 +30,13 @@ public class Controller implements Initializable {
         Platform.exit();
     }
 
-    public void setTfLogServer(String log){
-        taLogServer.appendText(log+"\n");
+    public void setTfLogServer(String log) {
+        Platform.runLater(() -> taLogServer.appendText(log + "\n"));
     }
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        taLogServer.appendText(log+"\n");
+        taLogServer.appendText(log + "\n");
     }
 }

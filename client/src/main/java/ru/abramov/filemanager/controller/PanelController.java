@@ -119,6 +119,11 @@ public class PanelController implements Initializable {
         filesTable.getItems().addAll(list);
     }
 
+    public void serverListClear() {
+        pathField.setText("Server is empty");
+        filesTable.getItems().clear(); // сначала чистим список
+    }
+
     public void btnPathUpAction(ActionEvent actionEvent) {
         Path upperPath = Paths.get(pathField.getText()).getParent();
         if(upperPath!= null){
