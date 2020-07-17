@@ -25,7 +25,8 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
         NAME_FILE_LENGTH_FO_GET, NAME, FILE_LENGTH, FILE,
         NAME_FILE_LENGTH_FO_SEND, SEND_FILE,
         NAME_FILE_LENGTH_FO_DELETE, DELETE_FILE,
-        LOGIN_LENGTH, LOGIN, PASSWORD_LENGTH, PASSWORD
+        LOGIN_LENGTH, LOGIN, PASSWORD_LENGTH, PASSWORD,
+        UPDATE_LIST
     }
 
     public ByteProtocolServerHandler(Controller controller) {
@@ -181,8 +182,8 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
                     if (fileLength == receivedFileLength) {
                         currentState = State.WAIT;
                         controller.setTfLogServer(LOGER + "Файл получен!");
-                        updateFilesList(ctx, clientPath);
                         out.close();
+                        updateFilesList(ctx, clientPath);
                         break;
                     }
                 }
@@ -236,11 +237,11 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
                             Files.createDirectory(clientPath);
                         }
                         NettyServer.setServerPath(clientPath);
-                        updateFilesList(ctx, clientPath);
                     } else {
                         ctx.channel().close();
                         controller.setTfLogServer(LOGER + "ctx.channel().isActive()" + ctx.channel().isActive());
                     }
+                    updateFilesList(ctx, clientPath);
                     controller.setTfLogServer(LOGER + " " + State.WAIT);
                     currentState = State.WAIT;
                 }
@@ -266,6 +267,7 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
                 System.out.println(stringListFileInfo);
                 controller.setTfLogServer("Отправка нового списка файлов - " + stringListFileInfo);
                 StringSender.sendString(String.valueOf(stringListFileInfo), ctx.channel());
+                currentState = State.WAIT;
             }
         } catch (IOException e) {
             e.printStackTrace();

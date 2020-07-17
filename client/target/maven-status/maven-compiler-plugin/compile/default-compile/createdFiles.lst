@@ -7,7 +7,7 @@ ru\abramov\filemanager\controller\PanelController$2.class
 ru\abramov\filemanager\controller\PanelController.class
 ru\abramov\filemanager\network\ByteProtocolClientHandler.class
 ru\abramov\filemanager\controller\Controller.class
+ru\abramov\filemanager\controller\Controller$1.class
 ru\abramov\filemanager\network\NettyClient$1.class
-ru\abramov\filemanager\controller\FileInfo.class
-ru\abramov\filemanager\controller\FileInfo$FileType.class
+ru\abramov\filemanager\controller\Controller$2.class
 ru\abramov\filemanager\controller\LoginController.class
