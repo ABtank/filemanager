@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
     @FXML
-    TextField tfLogin, tfHost;
+    TextField tfLogin, tfHost, tfNickname;
 
     @FXML
     PasswordField pfPassword;
@@ -27,10 +27,14 @@ public class LoginController implements Initializable {
 
     public void connect(ActionEvent actionEvent) throws IOException {
         if(!tfLogin.getText().trim().isEmpty()&&!pfPassword.getText().isEmpty()){
-            nettyClient = new NettyClient(tfLogin.getText(),pfPassword.getText(),tfHost.getText());
+            nettyClient = new NettyClient(tfLogin.getText(),pfPassword.getText(),tfHost.getText(), tfNickname.getText());
             System.out.println(nettyClient.getChannel()+" "+tfLogin.getText()+" "+pfPassword.getText());
             Main.setRoot("/main");
         }
+    }
+
+    public void authOk() throws IOException {
+        Main.setRoot("/main");
     }
 
     @Override

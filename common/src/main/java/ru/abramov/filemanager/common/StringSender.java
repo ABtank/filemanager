@@ -17,11 +17,12 @@ public class StringSender {
         sendString(password,channel);
     }
 
-    public static void sendFileList(String list, Channel channel) {
+    public static void sendChangeNickname(String login, String password, Channel channel, String nickname) {
 //        отправка сигнального байта
-        sendSignalByte(channel ,SignalByte.SET_LIST_FILE);
-//        ллист
-        sendString(list, channel);
+        sendSignalByte(channel ,SignalByte.CHANGE_NICKNAME);
+        sendString(nickname,channel);
+        sendString(login, channel);
+        sendString(password,channel);
     }
 
     public static void sendSignalByte(Channel channel, SignalByte signalByte) {

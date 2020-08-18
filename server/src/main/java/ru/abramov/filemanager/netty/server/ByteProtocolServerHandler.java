@@ -26,7 +26,7 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
         NAME_FILE_LENGTH_FO_SEND, SEND_FILE,
         NAME_FILE_LENGTH_FO_DELETE, DELETE_FILE,
         LOGIN_LENGTH, LOGIN, PASSWORD_LENGTH, PASSWORD,
-        UPDATE_LIST
+        NICKNAME_LENGTH, NICKNAME, UPDATE_LIST
     }
 
     public ByteProtocolServerHandler(Controller controller) {
@@ -78,6 +78,10 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
                     currentState = State.LOGIN_LENGTH;
                     receivedFileLength = 0L;
                     controller.setTfLogServer(LOGER + "Сигнальный байт = " + signalByte + " = авторизация");
+                } else if (signalByte == SignalByte.CHANGE_NICKNAME.getActByte()) {
+                    currentState = State.NICKNAME_LENGTH;
+                    receivedFileLength = 0L;
+                    controller.setTfLogServer(LOGER + "Сигнальный байт = " + signalByte + " = регистрация");
                 } else if (signalByte == SignalByte.REQUEST_FILE.getActByte()) {
                     currentState = State.NAME_FILE_LENGTH_FO_SEND;
                     receivedFileLength = 0L;
@@ -191,6 +195,25 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
             /**
              * Авторизация
              */
+//            Получаем длинну nickname
+            if (currentState == State.NICKNAME_LENGTH) {
+                if (buf.readableBytes() >= 4) {
+                    controller.setTfLogServer(LOGER + "Получаем длинну nickname");
+                    nextLength = buf.readInt();
+                    controller.setTfLogServer(LOGER + "Длинна nickname = " + nextLength);
+                    currentState = State.NICKNAME;
+                }
+            }
+//            Получаем nickname
+            if (currentState == State.NICKNAME) {
+                if (buf.readableBytes() >= nextLength) {
+                    byte[] clientLoginBuf = new byte[nextLength];
+                    buf.readBytes(clientLoginBuf);
+                    nickname = new String(clientLoginBuf, "UTF-8");
+                    controller.setTfLogServer(LOGER + "Получаем nickname =" + login);
+                    currentState = State.LOGIN_LENGTH;
+                }
+            }
 //            Получаем длинну логина
             if (currentState == State.LOGIN_LENGTH) {
                 if (buf.readableBytes() >= 4) {
@@ -226,30 +249,40 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
                     buf.readBytes(clientPasswordBuf);
                     String password = new String(clientPasswordBuf, "UTF-8");
                     controller.setTfLogServer(LOGER + "Получаем пароль = " + password);
-                    nickname = SqlClient.getNickname(login, password);
-                    if (nickname != null) {
-                        controller.setTfLogServer(LOGER + "nickname= " + nickname);
-                        StringSender.sendSignalByte(ctx.channel(), SignalByte.AUTH);
-                        StringSender.sendString(nickname, ctx.channel());
-                        clientPath = Paths.get(nettyServerPath + "\\" + nickname);
-                        if (!Files.exists(clientPath)) {
-                            controller.setTfLogServer(LOGER + "создаем путь для нового пользователя\n" + clientPath);
-                            Files.createDirectory(clientPath);
-                        }
-                        NettyServer.setServerPath(clientPath);
-                    } else {
-                        ctx.channel().close();
-                        controller.setTfLogServer(LOGER + "ctx.channel().isActive()" + ctx.channel().isActive());
-                    }
-                    updateFilesList(ctx, clientPath);
-                    controller.setTfLogServer(LOGER + " " + State.WAIT);
-                    currentState = State.WAIT;
+                    if (nickname == null) askSQL(ctx, password);
+                    else AskSqlChengeNickname(ctx, password);
                 }
             }
         }
         if (buf.readableBytes() == 0) {
             buf.release();
         }
+    }
+
+    private void AskSqlChengeNickname(ChannelHandlerContext ctx, String password) {
+        controller.setTfLogServer(LOGER + "запрос регистрации:" +" nickname="+nickname+" login="+login+" password="+password);
+        currentState = State.WAIT;
+    }
+
+    private void askSQL(ChannelHandlerContext ctx, String password) throws IOException {
+        nickname = SqlClient.getNickname(login, password);
+        if (nickname != null) {
+            controller.setTfLogServer(LOGER + "nickname= " + nickname);
+            StringSender.sendSignalByte(ctx.channel(), SignalByte.AUTH);
+            StringSender.sendString(nickname, ctx.channel());
+            clientPath = Paths.get(nettyServerPath + "\\" + nickname);
+            if (!Files.exists(clientPath)) {
+                controller.setTfLogServer(LOGER + "создаем путь для нового пользователя\n" + clientPath);
+                Files.createDirectory(clientPath);
+            }
+            NettyServer.setServerPath(clientPath);
+        } else {
+            ctx.channel().close();
+            controller.setTfLogServer(LOGER + "ctx.channel().isActive()" + ctx.channel().isActive());
+        }
+        updateFilesList(ctx, clientPath);
+        controller.setTfLogServer(LOGER + " " + State.WAIT);
+        currentState = State.WAIT;
     }
 
 
@@ -269,7 +302,7 @@ public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
                 StringSender.sendString(String.valueOf(stringListFileInfo), ctx.channel());
                 currentState = State.WAIT;
             } else {
-               StringSender.sendSignalByte(ctx.channel(), SignalByte.CLEAR_LIST_SERVER);
+                StringSender.sendSignalByte(ctx.channel(), SignalByte.CLEAR_LIST_SERVER);
             }
         } catch (IOException e) {
             e.printStackTrace();

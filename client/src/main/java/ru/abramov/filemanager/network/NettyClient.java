@@ -17,7 +17,7 @@ public class NettyClient {
     private static String host;
     private static final int PORT = 8189;
 
-    public NettyClient(String login, String password, String host) {
+    public NettyClient(String login, String password, String host, String nickname) {
         NettyClient.host = host;
         Thread t = new Thread(() -> {
             EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -34,7 +34,8 @@ public class NettyClient {
                             }
                         });
                 ChannelFuture future = b.connect(host, PORT).sync();
-                StringSender.sendAuth(login, password, channel);
+                if(nickname.length() == 0)StringSender.sendAuth(login, password, channel);
+                else StringSender.sendChangeNickname(login,password,channel,nickname);
                 future.channel().closeFuture().sync();
             } catch (Exception e) {
                 e.printStackTrace();
