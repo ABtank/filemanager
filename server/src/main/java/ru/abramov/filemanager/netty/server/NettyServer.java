@@ -42,7 +42,8 @@ public class NettyServer {
                     });
             ChannelFuture future = b.bind(PORT).sync(); // запуск сервера
             controller.setTfLogServer("Netty server ON");
-            SqlClient.connect();
+//            SqlClient.connect();
+            SqlClient.getMySQLConnection();
             controller.setTfLogServer("DB connected");
             future.channel().closeFuture().sync(); // остановка сервера
             SqlClient.disConnect();

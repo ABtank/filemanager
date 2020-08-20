@@ -5,6 +5,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -16,7 +18,10 @@ public class Controller implements Initializable {
     public static String log = "hi";
 
     public void connect(ActionEvent actionEvent) {
-        new NettyServer(this);
+//        ApplicationContext context = new ClassPathXmlApplicationContext("spring-context.xml");
+        ApplicationContext context = new AnnotationConfigApplicationContext(SpringConfig.class);
+        context.getBean("nettyServer", NettyServer.class);
+//        new NettyServer(this);
         setTfLogServer("connect");
     }
 
