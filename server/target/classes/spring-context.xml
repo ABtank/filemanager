@@ -9,25 +9,26 @@
 
     <context:component-scan base-package="ru.geekbrains.server"/>
 
-<!--    <bean id="sqlClient" class="ru.abramov.filemanager.netty.server.SqlClient">-->
-<!--        <constructor-arg ref="dataSource"/>-->
-<!--    </bean>-->
+    <bean id="sqlClient" class="ru.abramov.filemanager.netty.server.SqlClient">
+        <constructor-arg ref="dataSource"/>
+    </bean>
 
-<!--    <bean id="byteProtocolServerHandler" class="ru.abramov.filemanager.netty.server.ByteProtocolServerHandler">-->
-<!--        <constructor-arg ref="controller"/>-->
-<!--    </bean>-->
+    <bean id="byteProtocolServerHandler" class="ru.abramov.filemanager.netty.server.ByteProtocolServerHandler">
+        <constructor-arg ref="controller"/>
+    </bean>
 
-<!--    <bean id="nettyServer" class="ru.abramov.filemanager.netty.server.NettyServer">-->
-<!--        <constructor-arg ref="controller"/>-->
-<!--    </bean>-->
+    <bean id="nettyServer" class="ru.abramov.filemanager.netty.server.NettyServer">
+        <constructor-arg ref="controller"/>
+    </bean>
 
 <!--    <bean id="controller" class="ru.abramov.filemanager.netty.server.Controller"/>-->
+<!--    <bean id="serverGUI" class="ru.abramov.filemanager.netty.server.ServerGUI"/>-->
 
-<!--    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">-->
-<!--        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>-->
-<!--        <property name="username" value="root"/>-->
-<!--        <property name="password" value="Z4Vesrfd1."/>-->
-<!--        <property name="url"-->
-<!--                  value="jdbc:mysql://localhost:3306/mysql_chat?&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=UTC"/>-->
-<!--    </bean>-->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="username" value="root"/>
+        <property name="password" value="Z4Vesrfd1."/>
+        <property name="url"
+                  value="jdbc:mysql://localhost:3306/mysql_chat?&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=UTC"/>
+    </bean>
 </beans>

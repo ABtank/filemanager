@@ -5,23 +5,22 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
+@Component
+@FxmlView("/mainserver.fxml")
 public class Controller implements Initializable {
     @FXML
     TextArea taLogServer;
 
-    public static String log = "hi";
+    public static String log = "Welcome";
 
     public void connect(ActionEvent actionEvent) {
-//        ApplicationContext context = new ClassPathXmlApplicationContext("spring-context.xml");
-        ApplicationContext context = new AnnotationConfigApplicationContext(SpringConfig.class);
-        context.getBean("nettyServer", NettyServer.class);
-//        new NettyServer(this);
+        new NettyServer(this);
         setTfLogServer("connect");
     }
 

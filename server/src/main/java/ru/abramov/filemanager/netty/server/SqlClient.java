@@ -30,7 +30,7 @@ public class SqlClient {
         String hostname = "localhost";
         String dbName = "mysql_chat";
         String user = "root";
-        String password = "root";
+        String password = "Z4Vesrfd1.";
 
         return getMySQLConnection(hostname, dbName, user, password);
     }
