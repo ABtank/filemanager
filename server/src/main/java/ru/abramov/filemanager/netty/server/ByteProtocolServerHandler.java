@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import org.springframework.stereotype.Component;
 import ru.abramov.filemanager.common.FileInfo;
 import ru.abramov.filemanager.common.FileSender;
 import ru.abramov.filemanager.common.SignalByte;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Component
 public class ByteProtocolServerHandler extends ChannelInboundHandlerAdapter {
 
     public enum State {

@@ -21,9 +21,6 @@
         <constructor-arg ref="controller"/>
     </bean>
 
-<!--    <bean id="controller" class="ru.abramov.filemanager.netty.server.Controller"/>-->
-<!--    <bean id="serverGUI" class="ru.abramov.filemanager.netty.server.ServerGUI"/>-->
-
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
         <property name="username" value="root"/>

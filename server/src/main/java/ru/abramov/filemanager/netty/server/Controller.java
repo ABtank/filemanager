@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-@Component
+@Component ("controller")
 @FxmlView("/mainserver.fxml")
 public class Controller implements Initializable {
     @FXML
