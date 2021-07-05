@@ -12,10 +12,14 @@ import ru.abramov.filemanager.controller.Callback;
 public class NettyClient {
     private SocketChannel channel;
 
+    public SocketChannel getChannel() {
+        return channel;
+    }
+
     private static final String HOST = "localhost";
     private static final int PORT = 8189;
 
-    public NettyClient(Callback onMessageReceivedCallback) {
+    public NettyClient() {
         Thread t = new Thread(() -> {
             EventLoopGroup workerGroup = new NioEventLoopGroup();
             try {
@@ -26,8 +30,9 @@ public class NettyClient {
                             @Override
                             protected void initChannel(SocketChannel socketChannel) throws Exception {
                                 channel = socketChannel;
-                                socketChannel.pipeline().addLast(new StringDecoder(), new StringEncoder(),
-                                        new ClientHandler(onMessageReceivedCallback)
+                                socketChannel.pipeline().addLast( new ByteProtocolHandler()
+//                                        new StringDecoder(), new StringEncoder()
+                                       // new ClientHandler(onMessageReceivedCallback)
                                 );
                             }
                         });

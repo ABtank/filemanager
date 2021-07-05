@@ -7,6 +7,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import ru.abramov.filemanager.network.FileSender;
 import ru.abramov.filemanager.network.NettyClient;
 
 import java.io.IOException;
@@ -22,16 +24,28 @@ public class Controller implements Initializable {
 
     @FXML
     VBox panelClient, panelServer;
+    @FXML
+    Label lbNickname;
 
     NettyClient nettyClient = LoginController.getNettyClient();
+    private static Path serverPath;
+    private String nickname = "DefaultClient";
+
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void initialize(URL location, ResourceBundle resources){
+        //1)Получаю никнейм и зааписываю в
+        lbNickname.setText("Hello " + nickname);
+        Path serverPath = Paths.get("./", "TestA", "server",nickname);
+        System.out.println(serverPath);
+        PanelController serverPC = (PanelController) panelServer.getProperties().get("ctrl");
+        serverPC.updateList(serverPath.normalize().toAbsolutePath());
         System.out.println("run fxml main");
     }
 
 
     public void menuItemFileExitAction(ActionEvent actionEvent) {
+        nettyClient.close();
         Platform.exit();
     }
 
@@ -44,7 +58,6 @@ public class Controller implements Initializable {
     public void copyAction(ActionEvent actionEvent) {
         PanelController clientPC = (PanelController) panelClient.getProperties().get("ctrl");
         PanelController serverPC = (PanelController) panelServer.getProperties().get("ctrl");
-
         if (clientPC.getSelectedFileName() == null && serverPC.getSelectedFileName() == null) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Нифига не выбрано", ButtonType.OK);
             alert.showAndWait();
@@ -78,7 +91,6 @@ public class Controller implements Initializable {
     public void moveAction(ActionEvent actionEvent) {
         PanelController clientPC = (PanelController) panelClient.getProperties().get("ctrl");
         PanelController serverPC = (PanelController) panelServer.getProperties().get("ctrl");
-
         if (clientPC.getSelectedFileName() == null && serverPC.getSelectedFileName() == null) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Нифига не выбрано", ButtonType.OK);
             alert.showAndWait();
@@ -110,6 +122,30 @@ public class Controller implements Initializable {
     }
 
     public void deleteAction(ActionEvent actionEvent) {
+        PanelController clientPC = (PanelController) panelClient.getProperties().get("ctrl");
+        PanelController serverPC = (PanelController) panelServer.getProperties().get("ctrl");
+        if (clientPC.getSelectedFileName() == null && serverPC.getSelectedFileName() == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Нифига не выбрано", ButtonType.OK);
+            alert.showAndWait();
+            return;
+        }
+        PanelController srcPC = null;
+
+        if (clientPC.getSelectedFileName() != null) {
+            srcPC = clientPC;
+        }
+        if (serverPC.getSelectedFileName() != null) {
+            srcPC = serverPC;
+        }
+        Path srcPath = Paths.get(srcPC.getCurrentPath(), srcPC.getSelectedFileName());
+
+        try {
+            if (!Files.isDirectory(srcPath)) Files.delete(srcPath);
+            srcPC.updateList(Paths.get(srcPC.getCurrentPath())); //обновляем панель куда скопировали
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Не получилось удалить", ButtonType.OK);
+            alert.showAndWait();
+        }
     }
 
     public void connect(ActionEvent actionEvent) {
@@ -118,5 +154,27 @@ public class Controller implements Initializable {
     public void menuSingOut(ActionEvent actionEvent) throws IOException {
         Main.setRoot("/login");
         nettyClient.close();
+    }
+
+
+    public void sendFile() {
+        PanelController clientPC = (PanelController) panelClient.getProperties().get("ctrl");
+        PanelController serverPC = (PanelController) panelServer.getProperties().get("ctrl");
+        try {
+            // обработка завершения передачи файла через листнер future
+            FileSender.sendFile(Paths.get(clientPC.getAbsolutePathSelectedFile()), nettyClient.getChannel(), future -> {
+                if (!future.isSuccess()) {
+                    future.cause().printStackTrace();
+                }
+                if (future.isSuccess()) {
+                    System.out.println("Файл " + clientPC.getSelectedFileName() + " успешно передан");
+                    serverPC.updateList(Paths.get(serverPC.getCurrentPath()));
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Не удалось отправить файл" + serverPath.normalize().toAbsolutePath(), ButtonType.OK);
+            alert.showAndWait();
+        }
     }
 }

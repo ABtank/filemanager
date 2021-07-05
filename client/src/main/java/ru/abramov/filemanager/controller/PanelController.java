@@ -85,6 +85,7 @@ public class PanelController implements Initializable {
             @Override
             public void handle(MouseEvent event) {
                 if(event.getClickCount() == 2){
+                    System.out.println(getAbsolutePathSelectedFile());
                     Path path = Paths.get(pathField.getText()).resolve(filesTable.getSelectionModel().getSelectedItem().getFileName());
                     if(Files.isDirectory(path)){
                         updateList(path);
@@ -93,7 +94,7 @@ public class PanelController implements Initializable {
             }
         });
 
-        updateList(Paths.get(".")); // корневой каталог
+        updateList(Paths.get("./","TestA")); // корневой каталог
 
     }
 
@@ -130,5 +131,9 @@ public class PanelController implements Initializable {
 
     public String getCurrentPath() {
         return pathField.getText();
+    }
+
+    public String getAbsolutePathSelectedFile(){
+        return getCurrentPath()+"\\"+getSelectedFileName();
     }
 }

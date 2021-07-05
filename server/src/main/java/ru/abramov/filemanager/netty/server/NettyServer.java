@@ -10,9 +10,20 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class NettyServer {
     private static final int PORT = 8189;
+    private static Path serverPath;
 
+    public static Path getServerPath() {
+        return serverPath = Paths.get("./", "TestA", "server");
+    }
+
+    public static void setServerPath(Path serverPath) {
+        NettyServer.serverPath = serverPath;
+    }
 
     public static void main(String[] args) {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1); // пул потоков подключения клиентов
@@ -24,7 +35,8 @@ public class NettyServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast(new StringDecoder(), new StringEncoder(), new MainHandler());
+                            // socketChannel.pipeline().addLast(new StringDecoder(), new StringEncoder(), new MainHandler());
+                            socketChannel.pipeline().addLast(new ByteProtocolHandler());
                         }
                     });
             ChannelFuture future = b.bind(PORT).sync(); // запуск сервера
