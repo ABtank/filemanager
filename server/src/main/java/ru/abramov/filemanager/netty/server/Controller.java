@@ -5,15 +5,19 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
+@Component ("controller")
+@FxmlView("/mainserver.fxml")
 public class Controller implements Initializable {
     @FXML
     TextArea taLogServer;
 
-    public static String log = "hi";
+    public static String log = "Welcome";
 
     public void connect(ActionEvent actionEvent) {
         new NettyServer(this);
